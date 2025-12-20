@@ -135,13 +135,13 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
                 <button
                   type="button"
                   onClick={handleInstallClick}
-                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl border-2 border-slate-200 transition-all text-base flex items-center justify-center gap-2"
-                  style={{ backgroundColor: '#f1f5f9', color: '#475569' }}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 transition-all text-base flex items-center justify-center gap-2 uppercase tracking-wide"
+                  style={{ backgroundColor: '#3b82f6', color: '#ffffff' }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Install App
+                  INSTALL APP
                 </button>
               </div>
             )}
