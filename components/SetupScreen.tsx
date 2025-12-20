@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface SetupScreenProps {
   onStart: (config: { p1Name: string; p2Name: string; gridSize: number }) => void;
@@ -8,6 +8,26 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(6);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then((choiceResult: any) => {
+      if (choiceResult.outcome === 'accepted') {
+        setInstallPrompt(null);
+      }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +36,20 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto">
-      <div className="bg-white/90 backdrop-blur-sm border-2 border-slate-300 rounded-lg shadow-xl p-8 w-full">
+      <div className="bg-white/90 backdrop-blur-sm border-2 border-slate-300 rounded-lg shadow-xl p-8 w-full relative">
+        
+        {installPrompt && (
+          <button
+            onClick={handleInstall}
+            className="absolute -top-4 -right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg animate-bounce z-50 hover:bg-blue-700"
+            title="Install App"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </button>
+        )}
+
         <h1 className="text-4xl font-bold text-slate-800 text-center mb-8" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}>
           Dots & Boxes
         </h1>

@@ -1,30 +1,43 @@
-const CACHE_NAME = 'dots-boxes-v1';
-const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+const CACHE_NAME = 'dots-boxes-dynamic-v1';
 
-// Install event - cache core files
+// Install event
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(URLS_TO_CACHE);
-    })
-  );
   self.skipWaiting();
 });
 
-// Activate event - claim clients to take control immediately
+// Activate event
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
 
-// Fetch event - required for PWA to be installable
+// Fetch event with dynamic caching
 self.addEventListener('fetch', (event) => {
+  // Only handle http/https requests
+  if (!event.request.url.startsWith('http')) return;
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        // Check if we received a valid response
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          // If it's an external resource (like fonts/icons), just return it
+          // We can optionally cache opaque responses here if needed
+          return response;
+        }
+
+        // Clone the response because it's a stream and can only be consumed once
+        const responseToCache = response.clone();
+
+        caches.open(CACHE_NAME)
+          .then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+
+        return response;
+      })
+      .catch(() => {
+        // If network fails, try to return from cache
+        return caches.match(event.request);
+      })
   );
 });
