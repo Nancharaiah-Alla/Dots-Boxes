@@ -1,0 +1,16 @@
+{
+  "name": "Dots & Boxes",
+  "short_name": "Dots & Boxes",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#fdfbf7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/fluency/512/grid.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

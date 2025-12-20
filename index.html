@@ -2,8 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Dots & Boxes</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#fdfbf7" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Dots & Boxes" />
+    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/512/grid.png" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,6 +32,7 @@
       body {
         font-family: 'Patrick Hand', cursive;
         overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
       }
       .paper-pattern {
         background-color: #fdfbf7;
@@ -54,7 +64,7 @@
 }
 </script>
 </head>
-  <body class="paper-pattern text-slate-700 h-screen overflow-hidden flex flex-col">
+  <body class="paper-pattern text-slate-700 h-[100dvh] overflow-hidden flex flex-col">
     <div id="root" class="h-full w-full"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
