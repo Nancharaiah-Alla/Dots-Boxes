@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 interface SetupScreenProps {
   onStart: (config: { p1Name: string; p2Name: string; gridSize: number }) => void;
+  onBack: () => void;
 }
 
-const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
+const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(6);
@@ -61,10 +62,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto">
+    <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
       <div className="bg-white/95 backdrop-blur-md border-2 border-slate-300 rounded-xl shadow-xl p-6 sm:p-8 w-full relative">
+        <button onClick={onBack} className="absolute left-4 top-4 text-slate-400 hover:text-slate-600 font-bold">← Back</button>
         
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 text-center mb-8 tracking-tight" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.05)' }}>
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 text-center mb-8 mt-4 tracking-tight" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.05)' }}>
           Dots & Boxes
         </h1>
         

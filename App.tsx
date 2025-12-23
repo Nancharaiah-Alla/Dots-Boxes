@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { DataConnection } from 'peerjs';
+import { DataConnection, Peer } from 'peerjs';
 import { 
   PLAYER_X, 
   PLAYER_O, 
@@ -37,8 +37,9 @@ function App() {
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
   
-  // PeerJS Connection Reference
+  // PeerJS Connection References
   const connectionRef = useRef<DataConnection | null>(null);
+  const peerRef = useRef<Peer | null>(null);
 
   // Helper to process a move on the state
   const processMove = (prev: GameState, type: LineType, r: number, c: number, rows: number, cols: number): GameState => {
@@ -122,8 +123,9 @@ function App() {
     setView('GAME');
   };
 
-  const handleStartOnline = (config: GameConfig, conn: DataConnection) => {
+  const handleStartOnline = (config: GameConfig, conn: DataConnection, peer: Peer) => {
     connectionRef.current = conn;
+    peerRef.current = peer;
     setGameConfig(config);
     setGameState(createInitialState(config.gridSize, config.gridSize));
     setView('GAME');
@@ -151,13 +153,19 @@ function App() {
   };
 
   const quitGame = () => {
-    // If online, close connection
+    // If online, close connection and destroy peer
     if (connectionRef.current) {
       // Try send quit message
       try { connectionRef.current.send({ type: 'QUIT' }); } catch(e) {}
       connectionRef.current.close();
       connectionRef.current = null;
     }
+
+    if (peerRef.current) {
+      peerRef.current.destroy();
+      peerRef.current = null;
+    }
+
     setGameConfig(null);
     setGameState(null);
     setView('MENU');
@@ -170,15 +178,6 @@ function App() {
         if (window.confirm("Do you want to leave the game?")) {
             quitGame();
         }
-        // Online "Reset" usually implies "Rematch" which is complex, 
-        // for now let's treat the button as "Leave" for online users or implement Rematch later.
-        // Actually, let's implement Rematch logic simply:
-        /*
-        if (connectionRef.current) {
-             connectionRef.current.send({ type: 'RESTART' });
-             setGameState(createInitialState(gameConfig.gridSize, gameConfig.gridSize));
-        }
-        */
        return;
     }
 
@@ -201,7 +200,6 @@ function App() {
       // If state changed and Online, send move
       if (gameConfig.mode === 'ONLINE' && connectionRef.current) {
          // Only send if move was valid (state changed, essentially check if lines differ)
-         // But processMove handles validation. If invalid, it returns prev.
          if (newState !== prev) {
              const msg: NetworkMessage = { type: 'MOVE', lineType: type, r, c };
              connectionRef.current.send(msg);
@@ -220,7 +218,7 @@ function App() {
   }
 
   if (view === 'SETUP_OFFLINE') {
-    return <SetupScreen onStart={handleStartOffline} />;
+    return <SetupScreen onStart={handleStartOffline} onBack={() => setView('MENU')} />;
   }
 
   if (view === 'SETUP_ONLINE') {

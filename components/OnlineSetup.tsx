@@ -4,7 +4,7 @@ import { GameConfig } from '../types';
 import { PLAYER_X, PLAYER_O } from '../constants';
 
 interface OnlineSetupProps {
-  onStartGame: (config: GameConfig, conn: DataConnection) => void;
+  onStartGame: (config: GameConfig, conn: DataConnection, peer: Peer) => void;
   onBack: () => void;
 }
 
@@ -19,19 +19,21 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
   
   const peerRef = useRef<Peer | null>(null);
   const connRef = useRef<DataConnection | null>(null);
+  const isGameStartingRef = useRef(false);
 
-  // Cleanup peer on unmount
+  // Cleanup peer on unmount ONLY if game is not starting
   useEffect(() => {
     return () => {
-      if (peerRef.current) {
+      // If the game is starting, we hand off the peer to App.tsx, so don't destroy it here.
+      if (peerRef.current && !isGameStartingRef.current) {
         peerRef.current.destroy();
       }
     };
   }, []);
 
   const generateShortId = () => {
-    // Generate a random 4-character string
-    return Math.random().toString(36).substring(2, 6).toUpperCase();
+    // Generate a 4-digit numeric ID
+    return Math.floor(1000 + Math.random() * 9000).toString();
   };
 
   const createRoom = () => {
@@ -83,8 +85,11 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
             // Send start config to guest
             conn.send({ type: 'START', config });
             
+            // Mark as starting so cleanup doesn't kill the peer
+            isGameStartingRef.current = true;
+
             // Start local
-            onStartGame(config, conn);
+            onStartGame(config, conn, peer);
           }
         });
       });
@@ -108,7 +113,7 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
     peerRef.current = peer;
 
     peer.on('open', () => {
-      const targetPeerId = `db-game-${roomId.toUpperCase()}`;
+      const targetPeerId = `db-game-${roomId}`; // Numeric ID is used here
       const conn = peer.connect(targetPeerId);
       connRef.current = conn;
 
@@ -126,13 +131,19 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
              ...data.config,
              myPlayer: PLAYER_O
           };
-          onStartGame(config, conn);
+          
+          // Mark as starting so cleanup doesn't kill the peer
+          isGameStartingRef.current = true;
+
+          onStartGame(config, conn, peer);
         }
       });
 
       conn.on('close', () => {
-        setStatus('Connection closed by host.');
-        setIsLoading(false);
+        if (!isGameStartingRef.current) {
+            setStatus('Connection closed by host.');
+            setIsLoading(false);
+        }
       });
       
       // Handle connection errors (e.g., ID not found)
@@ -227,7 +238,7 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
              ) : (
                <div className="flex flex-col items-center bg-blue-50 border-2 border-blue-100 rounded-xl p-6 mb-4">
                  <span className="text-slate-500 text-xs font-bold uppercase mb-2">Room Code</span>
-                 <div className="text-5xl font-mono font-bold text-blue-600 tracking-wider mb-2" onClick={copyToClipboard}>
+                 <div className="text-5xl font-mono font-bold text-blue-600 tracking-wider mb-2 select-all" onClick={copyToClipboard}>
                    {generatedId}
                  </div>
                  <p className="text-xs text-blue-400 mb-4">Share this code with your friend</p>
@@ -245,12 +256,12 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
              <div className="mb-6">
                 <label className="block text-slate-500 text-xs font-bold mb-1 uppercase">Room Code</label>
                 <input 
-                  type="text" 
+                  type="number"
+                  pattern="[0-9]*" 
                   value={roomId}
-                  onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-                  maxLength={4}
+                  onChange={(e) => setRoomId(e.target.value.slice(0, 4))}
                   className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-400 font-bold text-slate-800 bg-slate-50 font-mono tracking-widest text-center text-xl uppercase placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-300"
-                  placeholder="e.g. A4K9"
+                  placeholder="e.g. 1234"
                   disabled={isLoading}
                 />
               </div>
