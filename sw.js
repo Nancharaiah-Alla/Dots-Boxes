@@ -1,8 +1,14 @@
-const CACHE_NAME = 'dots-boxes-dynamic-v1';
+const CACHE_NAME = 'dots-boxes-dynamic-v2';
 
 // Install event
 self.addEventListener('install', (event) => {
   self.skipWaiting();
+  // Pre-cache the start URL to ensure Chrome considers the app "offline capable" immediately
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.add('/');
+    })
+  );
 });
 
 // Activate event
@@ -20,8 +26,6 @@ self.addEventListener('fetch', (event) => {
       .then((response) => {
         // Check if we received a valid response
         if (!response || response.status !== 200 || response.type !== 'basic') {
-          // If it's an external resource (like fonts/icons), just return it
-          // We can optionally cache opaque responses here if needed
           return response;
         }
 

@@ -11,3 +11,22 @@ export interface GameState {
 }
 
 export type LineType = 'horizontal' | 'vertical';
+
+export type GameMode = 'OFFLINE' | 'ONLINE';
+
+export interface GameConfig {
+  p1Name: string;
+  p2Name: string;
+  gridSize: number;
+  mode: GameMode;
+  roomId?: string; // For online display
+  myPlayer?: Player; // 'X' or 'O' (Only for online)
+}
+
+// Network Payload Types
+export type NetworkMessage = 
+  | { type: 'JOIN'; name: string }
+  | { type: 'START'; config: GameConfig }
+  | { type: 'MOVE'; lineType: LineType; r: number; c: number }
+  | { type: 'RESTART' }
+  | { type: 'QUIT' };

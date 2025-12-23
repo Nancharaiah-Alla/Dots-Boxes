@@ -7,23 +7,21 @@ interface GridProps {
   onLineClick: (type: LineType, row: number, col: number) => void;
   rows: number;
   cols: number;
+  disabled?: boolean;
 }
 
 // Helper to check if a line is filled
 const isHLineFilled = (gameState: GameState, r: number, c: number) => gameState.hLines[r]?.[c];
 const isVLineFilled = (gameState: GameState, r: number, c: number) => gameState.vLines[r]?.[c];
 
-const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
+const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disabled = false }) => {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const handleResize = () => {
       // Calculate natural width of the grid board including padding
-      // Grid has p-4 (16px*2) on mobile, sm:p-8 (32px*2) on desktop
       const gridPadding = window.innerWidth < 640 ? 32 : 64; 
       const boardWidth = cols * CORNER_SIZE + (cols - 1) * CELL_SIZE + gridPadding;
-      
-      // App container padding is p-4 (32px) + potential scrollbar buffer
       const availableWidth = window.innerWidth - 32; 
 
       if (boardWidth > availableWidth) {
@@ -38,10 +36,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [cols]);
 
-  // We construct the grid using a flex column layout of rows.
-  // Each "Visual Row" consists of dots and Horizontal Lines.
-  // Between Visual Rows, we have Vertical Lines and Squares.
-  
+  // Visual Row rendering
   const renderHorizontalRow = (rowIndex: number) => {
     const items = [];
     for (let col = 0; col < cols; col++) {
@@ -56,20 +51,20 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
         </div>
       );
 
-      // The Horizontal Line (if not last column)
+      // The Horizontal Line
       if (col < cols - 1) {
         const isFilled = isHLineFilled(gameState, rowIndex, col);
 
         items.push(
           <div 
             key={`h-${rowIndex}-${col}`}
-            className="relative flex items-center justify-center flex-shrink-0"
-            style={{ width: CELL_SIZE, height: CORNER_SIZE }} // Height matches corner size for alignment
-            onClick={() => !isFilled && !gameState.winner && onLineClick('horizontal', rowIndex, col)}
+            className={`relative flex items-center justify-center flex-shrink-0 ${disabled && !isFilled ? 'cursor-not-allowed' : ''}`}
+            style={{ width: CELL_SIZE, height: CORNER_SIZE }} 
+            onClick={() => !disabled && !isFilled && !gameState.winner && onLineClick('horizontal', rowIndex, col)}
           >
-            {/* Hit area helper - Increased to h-10 for accessibility when scaled */}
+            {/* Hit area */}
             <div 
-              className={`absolute left-0 right-0 h-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`} 
+              className={`absolute left-0 right-0 h-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner && !disabled ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`} 
               style={{ top: '50%', transform: 'translateY(-50%)' }}
             />
             
@@ -93,24 +88,20 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
   };
 
   const renderVerticalRow = (rowIndex: number) => {
-    // This row contains Vertical Lines and Squares
-    // rowIndex here corresponds to the square row index (0 to rows - 2)
     const items = [];
-
     for (let col = 0; col < cols; col++) {
-      // Vertical Line
       const isFilled = isVLineFilled(gameState, rowIndex, col);
       
       items.push(
         <div 
           key={`v-${rowIndex}-${col}`}
-          className="relative flex flex-col items-center justify-start flex-shrink-0"
-          style={{ height: CELL_SIZE, width: CORNER_SIZE }} // Width matches CORNER_SIZE
-          onClick={() => !isFilled && !gameState.winner && onLineClick('vertical', rowIndex, col)}
+          className={`relative flex flex-col items-center justify-start flex-shrink-0 ${disabled && !isFilled ? 'cursor-not-allowed' : ''}`}
+          style={{ height: CELL_SIZE, width: CORNER_SIZE }}
+          onClick={() => !disabled && !isFilled && !gameState.winner && onLineClick('vertical', rowIndex, col)}
         >
-          {/* Hit area helper - Increased to w-10 for accessibility when scaled */}
+          {/* Hit area */}
           <div 
-            className={`absolute top-0 bottom-0 w-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`}
+            className={`absolute top-0 bottom-0 w-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner && !disabled ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`}
             style={{ left: '50%', transform: 'translateX(-50%)' }}
           />
           
@@ -125,7 +116,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
         </div>
       );
 
-      // The Square (if not last column)
+      // The Square
       if (col < cols - 1) {
         const owner = gameState.squares[rowIndex]?.[col];
         items.push(
@@ -155,7 +146,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols }) => {
 
   return (
     <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-      <div className="inline-block p-4 sm:p-8 bg-white border border-slate-200 shadow-xl rounded-sm select-none">
+      <div className={`inline-block p-4 sm:p-8 bg-white border border-slate-200 shadow-xl rounded-sm select-none transition-opacity ${disabled && !gameState.winner ? 'opacity-90' : 'opacity-100'}`}>
         {Array.from({ length: rows }).map((_, r) => (
           <React.Fragment key={r}>
             {renderHorizontalRow(r)}

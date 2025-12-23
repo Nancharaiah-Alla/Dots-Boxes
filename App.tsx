@@ -1,30 +1,24 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { DataConnection } from 'peerjs';
 import { 
   PLAYER_X, 
   PLAYER_O, 
   Player, 
   SquareOwner 
 } from './constants';
-import { GameState, LineType } from './types';
+import { GameState, LineType, GameConfig, NetworkMessage } from './types';
 import Grid from './components/Grid';
 import ScoreBoard from './components/ScoreBoard';
 import SetupScreen from './components/SetupScreen';
+import MenuScreen from './components/MenuScreen';
+import OnlineSetup from './components/OnlineSetup';
 
-interface GameConfig {
-  p1Name: string;
-  p2Name: string;
-  gridSize: number;
-}
+type ViewState = 'MENU' | 'SETUP_OFFLINE' | 'SETUP_ONLINE' | 'GAME';
 
 // Initial state creation
 const createInitialState = (rows: number, cols: number): GameState => {
-  // H lines: rows x (cols - 1)
   const hLines = Array(rows).fill(null).map(() => Array(cols - 1).fill(false));
-  
-  // V lines: (rows - 1) x cols
   const vLines = Array(rows - 1).fill(null).map(() => Array(cols).fill(false));
-  
-  // Squares: (rows - 1) x (cols - 1)
   const squares = Array(rows - 1).fill(null).map(() => Array(cols - 1).fill(null));
 
   return {
@@ -39,62 +33,23 @@ const createInitialState = (rows: number, cols: number): GameState => {
 };
 
 function App() {
+  const [view, setView] = useState<ViewState>('MENU');
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [isGameEnded, setIsGameEnded] = useState(false);
+  
+  // PeerJS Connection Reference
+  const connectionRef = useRef<DataConnection | null>(null);
 
-  const startGame = (config: GameConfig) => {
-    setGameConfig(config);
-    setGameState(createInitialState(config.gridSize, config.gridSize));
-    setIsGameEnded(false);
-  };
-
-  const resetGame = () => {
-    // Go back to setup or restart with same config? 
-    // Usually reset game means restart with same players.
-    // If we want to go back to setup, we can add a different button.
-    // Let's restart with same config for now.
-    if (gameConfig) {
-      setGameState(createInitialState(gameConfig.gridSize, gameConfig.gridSize));
-      setIsGameEnded(false);
-    }
-  };
-
-  const quitGame = () => {
-    setGameConfig(null);
-    setGameState(null);
-  }
-
-  const checkGameEnd = useCallback((squares: SquareOwner[][], scores: Record<Player, number>, rows: number, cols: number) => {
-    const totalSquares = (rows - 1) * (cols - 1);
-    const filledSquares = scores[PLAYER_X] + scores[PLAYER_O];
-    
-    if (filledSquares === totalSquares) {
-      setIsGameEnded(true);
-      if (scores[PLAYER_X] > scores[PLAYER_O]) return PLAYER_X;
-      if (scores[PLAYER_O] > scores[PLAYER_X]) return PLAYER_O;
-      return 'Draw';
-    }
-    return null;
-  }, []);
-
-  const handleLineClick = useCallback((type: LineType, r: number, c: number) => {
-    if (!gameConfig) return;
-    const { gridSize } = gameConfig;
-    const ROWS = gridSize;
-    const COLS = gridSize;
-
-    setGameState(prev => {
-      if (!prev) return null;
-
-      // 1. Validate move
+  // Helper to process a move on the state
+  const processMove = (prev: GameState, type: LineType, r: number, c: number, rows: number, cols: number): GameState => {
+      // 1. Validate move (basic check, caller should also check)
       if (type === 'horizontal') {
-        if (prev.hLines[r][c]) return prev; // Already taken
+        if (prev.hLines[r][c]) return prev; 
       } else {
-        if (prev.vLines[r][c]) return prev; // Already taken
+        if (prev.vLines[r][c]) return prev;
       }
 
-      // 2. Clone state deeper for mutation
+      // 2. Clone state
       const newHLines = prev.hLines.map(row => [...row]);
       const newVLines = prev.vLines.map(row => [...row]);
       const newSquares = prev.squares.map(row => [...row]);
@@ -102,72 +57,51 @@ function App() {
       let squareCompleted = false;
 
       // 3. Mark the line
-      if (type === 'horizontal') {
-        newHLines[r][c] = true;
-      } else {
-        newVLines[r][c] = true;
-      }
+      if (type === 'horizontal') newHLines[r][c] = true;
+      else newVLines[r][c] = true;
 
       // 4. Check for completed squares
+      const ROWS = rows;
+      const COLS = cols;
+
       if (type === 'horizontal') {
-        // Check Square Above
-        if (r > 0) {
-          if (
-            newHLines[r-1][c] && 
-            newHLines[r][c] && 
-            newVLines[r-1][c] && 
-            newVLines[r-1][c+1]
-          ) {
+        // Above
+        if (r > 0 && newHLines[r-1][c] && newHLines[r][c] && newVLines[r-1][c] && newVLines[r-1][c+1]) {
             newSquares[r-1][c] = prev.currentPlayer;
             newScores[prev.currentPlayer]++;
             squareCompleted = true;
-          }
         }
-        // Check Square Below
-        if (r < ROWS - 1) {
-          if (
-            newHLines[r][c] && 
-            newHLines[r+1][c] && 
-            newVLines[r][c] && 
-            newVLines[r][c+1]
-          ) {
+        // Below
+        if (r < ROWS - 1 && newHLines[r][c] && newHLines[r+1][c] && newVLines[r][c] && newVLines[r][c+1]) {
             newSquares[r][c] = prev.currentPlayer;
             newScores[prev.currentPlayer]++;
             squareCompleted = true;
-          }
         }
-      } 
-      else { // Vertical
-        // Check Square Left
-        if (c > 0) {
-          if (
-            newHLines[r][c-1] && 
-            newHLines[r+1][c-1] && 
-            newVLines[r][c-1] && 
-            newVLines[r][c]
-          ) {
+      } else {
+        // Left
+        if (c > 0 && newHLines[r][c-1] && newHLines[r+1][c-1] && newVLines[r][c-1] && newVLines[r][c]) {
             newSquares[r][c-1] = prev.currentPlayer;
             newScores[prev.currentPlayer]++;
             squareCompleted = true;
-          }
         }
-        // Check Square Right
-        if (c < COLS - 1) {
-          if (
-            newHLines[r][c] && 
-            newHLines[r+1][c] && 
-            newVLines[r][c] && 
-            newVLines[r][c+1]
-          ) {
+        // Right
+        if (c < COLS - 1 && newHLines[r][c] && newHLines[r+1][c] && newVLines[r][c] && newVLines[r][c+1]) {
             newSquares[r][c] = prev.currentPlayer;
             newScores[prev.currentPlayer]++;
             squareCompleted = true;
-          }
         }
       }
 
-      // 5. Determine next player and winner
-      const winner = checkGameEnd(newSquares, newScores, ROWS, COLS);
+      // 5. Determine winner
+      const totalSquares = (ROWS - 1) * (COLS - 1);
+      const filledSquares = newScores[PLAYER_X] + newScores[PLAYER_O];
+      let winner = null;
+      if (filledSquares === totalSquares) {
+        if (newScores[PLAYER_X] > newScores[PLAYER_O]) winner = PLAYER_X;
+        else if (newScores[PLAYER_O] > newScores[PLAYER_X]) winner = PLAYER_O;
+        else winner = 'Draw';
+      }
+
       const nextPlayer = squareCompleted ? prev.currentPlayer : (prev.currentPlayer === PLAYER_X ? PLAYER_O : PLAYER_X);
 
       return {
@@ -177,31 +111,144 @@ function App() {
         squares: newSquares,
         scores: newScores,
         currentPlayer: nextPlayer,
-        winner: winner
+        winner: winner as any
       };
-    });
-  }, [gameConfig, checkGameEnd]);
+  };
 
-  if (!gameConfig || !gameState) {
-    return <SetupScreen onStart={startGame} />;
+  const handleStartOffline = (config: { p1Name: string; p2Name: string; gridSize: number }) => {
+    const fullConfig: GameConfig = { ...config, mode: 'OFFLINE' };
+    setGameConfig(fullConfig);
+    setGameState(createInitialState(config.gridSize, config.gridSize));
+    setView('GAME');
+  };
+
+  const handleStartOnline = (config: GameConfig, conn: DataConnection) => {
+    connectionRef.current = conn;
+    setGameConfig(config);
+    setGameState(createInitialState(config.gridSize, config.gridSize));
+    setView('GAME');
+
+    // Setup listener for incoming moves
+    conn.on('data', (data: any) => {
+      const msg = data as NetworkMessage;
+      if (msg.type === 'MOVE') {
+        setGameState(prev => {
+          if (!prev) return null;
+          return processMove(prev, msg.lineType, msg.r, msg.c, config.gridSize, config.gridSize);
+        });
+      } else if (msg.type === 'RESTART') {
+        setGameState(createInitialState(config.gridSize, config.gridSize));
+      } else if (msg.type === 'QUIT') {
+        alert('Opponent has left the game.');
+        quitGame();
+      }
+    });
+
+    conn.on('close', () => {
+      alert('Connection lost.');
+      quitGame();
+    });
+  };
+
+  const quitGame = () => {
+    // If online, close connection
+    if (connectionRef.current) {
+      // Try send quit message
+      try { connectionRef.current.send({ type: 'QUIT' }); } catch(e) {}
+      connectionRef.current.close();
+      connectionRef.current = null;
+    }
+    setGameConfig(null);
+    setGameState(null);
+    setView('MENU');
+  };
+
+  const resetGame = () => {
+    if (!gameConfig) return;
+    
+    if (gameConfig.mode === 'ONLINE') {
+        if (window.confirm("Do you want to leave the game?")) {
+            quitGame();
+        }
+        // Online "Reset" usually implies "Rematch" which is complex, 
+        // for now let's treat the button as "Leave" for online users or implement Rematch later.
+        // Actually, let's implement Rematch logic simply:
+        /*
+        if (connectionRef.current) {
+             connectionRef.current.send({ type: 'RESTART' });
+             setGameState(createInitialState(gameConfig.gridSize, gameConfig.gridSize));
+        }
+        */
+       return;
+    }
+
+    // Offline Reset
+    setGameState(createInitialState(gameConfig.gridSize, gameConfig.gridSize));
+  };
+
+  const handleLineClick = useCallback((type: LineType, r: number, c: number) => {
+    if (!gameConfig || !gameState) return;
+    
+    // Online check: Is it my turn?
+    if (gameConfig.mode === 'ONLINE' && gameConfig.myPlayer !== gameState.currentPlayer) {
+      return; // Not your turn
+    }
+
+    setGameState(prev => {
+      if (!prev) return null;
+      const newState = processMove(prev, type, r, c, gameConfig.gridSize, gameConfig.gridSize);
+      
+      // If state changed and Online, send move
+      if (gameConfig.mode === 'ONLINE' && connectionRef.current) {
+         // Only send if move was valid (state changed, essentially check if lines differ)
+         // But processMove handles validation. If invalid, it returns prev.
+         if (newState !== prev) {
+             const msg: NetworkMessage = { type: 'MOVE', lineType: type, r, c };
+             connectionRef.current.send(msg);
+         }
+      }
+      
+      return newState;
+    });
+  }, [gameConfig, gameState]);
+
+
+  // RENDER LOGIC
+  
+  if (view === 'MENU') {
+    return <MenuScreen onSelectMode={(mode) => setView(mode === 'ONLINE' ? 'SETUP_ONLINE' : 'SETUP_OFFLINE')} />;
   }
+
+  if (view === 'SETUP_OFFLINE') {
+    return <SetupScreen onStart={handleStartOffline} />;
+  }
+
+  if (view === 'SETUP_ONLINE') {
+    return <OnlineSetup onStartGame={handleStartOnline} onBack={() => setView('MENU')} />;
+  }
+
+  // GAME VIEW
+  if (!gameConfig || !gameState) return null;
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <header className="pt-4 sm:pt-6 pb-2 px-4 text-center z-10 relative">
-         {/* Quit/Back Button */}
         <button 
           onClick={quitGame}
           className="absolute left-4 top-4 sm:top-6 text-slate-400 hover:text-slate-600 font-bold text-sm sm:text-base"
         >
-          ← Back
+          ← Quit
         </button>
 
         <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 tracking-tight" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.1)' }}>
           Dots & Boxes
         </h1>
-        <p className="text-slate-500 mt-2 text-lg hidden sm:block">Connect dots to claim squares!</p>
+        {gameConfig.mode === 'ONLINE' && (
+             <div className="text-xs text-blue-500 font-mono mt-1">
+                 Room: {gameConfig.roomId}
+             </div>
+        )}
       </header>
 
       {/* Scoreboard */}
@@ -212,23 +259,27 @@ function App() {
         onReset={resetGame}
         p1Name={gameConfig.p1Name}
         p2Name={gameConfig.p2Name}
+        myPlayer={gameConfig.myPlayer}
       />
 
-      {/* Game Grid Container - Scrollable */}
+      {/* Game Grid */}
       <main className="flex-1 game-scroll overflow-auto flex items-start justify-center p-4 sm:p-8">
          <Grid 
            gameState={gameState} 
            onLineClick={handleLineClick} 
            rows={gameConfig.gridSize} 
            cols={gameConfig.gridSize} 
+           disabled={gameConfig.mode === 'ONLINE' && gameState.currentPlayer !== gameConfig.myPlayer}
           />
       </main>
 
-      {/* Footer Instructions (Optional) */}
+      {/* Footer */}
       <footer className="p-4 text-center text-slate-400 text-sm">
-        {isGameEnded 
-          ? "Game Over! Press Reset to play again." 
-          : `Current Turn: ${gameState.currentPlayer === PLAYER_X ? gameConfig.p1Name : gameConfig.p2Name}`
+        {gameState.winner
+          ? "Game Over!" 
+          : gameConfig.mode === 'ONLINE' 
+             ? (gameState.currentPlayer === gameConfig.myPlayer ? "It's your turn!" : `Waiting for ${gameState.currentPlayer === PLAYER_X ? gameConfig.p1Name : gameConfig.p2Name}...`)
+             : `Current Turn: ${gameState.currentPlayer === PLAYER_X ? gameConfig.p1Name : gameConfig.p2Name}`
         }
       </footer>
     </div>
