@@ -179,9 +179,30 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
     setIsDrawing(false);
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (win) return;
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (target) {
+        const cell = target.closest('[data-cell]');
+        if (cell) {
+             const r = parseInt(cell.getAttribute('data-row') || '-1', 10);
+             const c = parseInt(cell.getAttribute('data-col') || '-1', 10);
+             if (r !== -1 && c !== -1) {
+                 handlePointerEnter(r, c);
+             }
+        }
+    }
+  };
+
   useEffect(() => {
     window.addEventListener('pointerup', handlePointerUp);
-    return () => window.removeEventListener('pointerup', handlePointerUp);
+    // Also listen for touchend globally to stop drawing
+    window.addEventListener('touchend', handlePointerUp);
+    return () => {
+        window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('touchend', handlePointerUp);
+    }
   }, []);
 
   const getCellColor = (val: number) => {
@@ -289,6 +310,7 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
                      gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
                      gap: '8px',
                   }}
+                  onTouchMove={handleTouchMove}
                 >
                    {Array.from({ length: gridSize * gridSize }).map((_, i) => {
                      const r = Math.floor(i / gridSize);
@@ -307,6 +329,9 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
                      return (
                        <div
                          key={key}
+                         data-cell="true"
+                         data-row={r}
+                         data-col={c}
                          onPointerDown={(e) => {
                              e.preventDefault(); 
                              handlePointerDown(r, c);
