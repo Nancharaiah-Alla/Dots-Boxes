@@ -12,8 +12,8 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
   const [activeTab, setActiveTab] = useState<'HOST' | 'JOIN'>('HOST');
   const [name, setName] = useState('');
   const [gridSize, setGridSize] = useState(6);
-  const [roomId, setRoomId] = useState(''); // User input for joining
-  const [generatedId, setGeneratedId] = useState(''); // Host ID
+  const [roomId, setRoomId] = useState(''); 
+  const [generatedId, setGeneratedId] = useState(''); 
   const [status, setStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -21,20 +21,15 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
   const connRef = useRef<DataConnection | null>(null);
   const isGameStartingRef = useRef(false);
 
-  // Cleanup peer on unmount ONLY if game is not starting
   useEffect(() => {
     return () => {
-      // If the game is starting, we hand off the peer to App.tsx, so don't destroy it here.
       if (peerRef.current && !isGameStartingRef.current) {
         peerRef.current.destroy();
       }
     };
   }, []);
 
-  const generateShortId = () => {
-    // Generate a 4-digit numeric ID
-    return Math.floor(1000 + Math.random() * 9000).toString();
-  };
+  const generateShortId = () => Math.floor(1000 + Math.random() * 9000).toString();
 
   const createRoom = () => {
     if (!name.trim()) {
@@ -48,47 +43,36 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
     const shortId = generateShortId();
     const fullPeerId = `db-game-${shortId}`;
     
-    // Create Peer
     const peer = new Peer(fullPeerId);
     peerRef.current = peer;
 
     peer.on('open', (id) => {
       setGeneratedId(shortId);
       setIsLoading(false);
-      setStatus('Waiting for opponent to join...');
+      setStatus('Waiting for opponent...');
     });
 
     peer.on('error', (err) => {
       console.error(err);
-      setStatus('Error creating room. Please try again.');
+      setStatus('Error creating room.');
       setIsLoading(false);
     });
 
     peer.on('connection', (conn) => {
-      // Host receives connection
       connRef.current = conn;
-      
       conn.on('open', () => {
-        // Wait for 'JOIN' message from guest
         conn.on('data', (data: any) => {
           if (data && data.type === 'JOIN') {
-            // Start Game!
             const config: GameConfig = {
-              p1Name: name, // Host is always P1 (X)
+              p1Name: name, 
               p2Name: data.name || 'Opponent',
               gridSize,
               mode: 'ONLINE',
               roomId: shortId,
               myPlayer: PLAYER_X
             };
-            
-            // Send start config to guest
             conn.send({ type: 'START', config });
-            
-            // Mark as starting so cleanup doesn't kill the peer
             isGameStartingRef.current = true;
-
-            // Start local
             onStartGame(config, conn, peer);
           }
         });
@@ -107,46 +91,39 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
     }
 
     setIsLoading(true);
-    setStatus('Connecting to room...');
+    setStatus('Connecting...');
 
-    const peer = new Peer(); // Auto-gen ID for guest
+    const peer = new Peer(); 
     peerRef.current = peer;
 
     peer.on('open', () => {
-      const targetPeerId = `db-game-${roomId}`; // Numeric ID is used here
+      const targetPeerId = `db-game-${roomId}`; 
       const conn = peer.connect(targetPeerId);
       connRef.current = conn;
 
       conn.on('open', () => {
-        setStatus('Connected! Joining game...');
-        // Send my name
+        setStatus('Connected! Joining...');
         conn.send({ type: 'JOIN', name });
       });
 
       conn.on('data', (data: any) => {
         if (data && data.type === 'START') {
-          // Received start config from Host
-          // I am Player 2 (O)
           const config: GameConfig = {
              ...data.config,
              myPlayer: PLAYER_O
           };
-          
-          // Mark as starting so cleanup doesn't kill the peer
           isGameStartingRef.current = true;
-
           onStartGame(config, conn, peer);
         }
       });
 
       conn.on('close', () => {
         if (!isGameStartingRef.current) {
-            setStatus('Connection closed by host.');
+            setStatus('Host closed connection.');
             setIsLoading(false);
         }
       });
       
-      // Handle connection errors (e.g., ID not found)
       peer.on('error', (err) => {
          console.error(err);
          setStatus('Could not connect. Check Room ID.');
@@ -156,69 +133,69 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
 
     peer.on('error', (err) => {
       console.error(err);
-      setStatus('Connection error. Please try again.');
+      setStatus('Connection error.');
       setIsLoading(false);
     });
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedId);
-    setStatus('Room ID copied!');
-    setTimeout(() => setStatus('Waiting for opponent to join...'), 2000);
+    setStatus('Copied!');
+    setTimeout(() => setStatus('Waiting for opponent...'), 2000);
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
-      <div className="bg-white/95 backdrop-blur-md border-2 border-slate-300 rounded-xl shadow-xl p-6 sm:p-8 w-full relative">
-        <button onClick={onBack} className="absolute left-4 top-4 text-slate-400 hover:text-slate-600 font-bold">← Back</button>
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 w-full relative transition-all">
         
-        <h2 className="text-3xl font-bold text-slate-800 text-center mb-6 mt-2">Online Lobby</h2>
+        <div className="flex items-center justify-between mb-6">
+           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors">←</button>
+           <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Online Lobby</h2>
+           <div className="w-10"></div>
+        </div>
 
         {/* Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-lg mb-6">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl mb-6">
           <button 
             onClick={() => { setActiveTab('HOST'); setStatus(''); }}
-            className={`flex-1 py-2 rounded-md font-bold text-sm transition-all ${activeTab === 'HOST' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'HOST' ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-300 shadow-md' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'}`}
           >
             Create Room
           </button>
           <button 
              onClick={() => { setActiveTab('JOIN'); setStatus(''); }}
-             className={`flex-1 py-2 rounded-md font-bold text-sm transition-all ${activeTab === 'JOIN' ? 'bg-white text-green-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+             className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'JOIN' ? 'bg-white dark:bg-slate-600 text-green-600 dark:text-green-300 shadow-md' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'}`}
           >
             Join Room
           </button>
         </div>
 
-        {/* Common Name Input */}
-        <div className="mb-4">
-          <label className="block text-slate-500 text-xs font-bold mb-1 uppercase">Your Name</label>
+        <div className="space-y-4 mb-6">
           <input 
             type="text" 
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={12}
-            className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 font-bold text-slate-800 bg-slate-50"
-            placeholder="Enter name"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-slate-400 dark:focus:border-slate-500 rounded-xl font-bold text-slate-800 dark:text-slate-100 outline-none transition-all placeholder:text-slate-400"
+            placeholder="Your Name"
             disabled={isLoading || !!generatedId}
           />
         </div>
 
         {activeTab === 'HOST' && (
-          <div className="animate-in">
+          <div className="animate-in space-y-4">
              {!generatedId ? (
                <>
-                <div className="mb-6">
-                  <label className="block text-slate-500 text-xs font-bold mb-3 uppercase text-center">Grid Size</label>
+                <div>
                   <div className="flex justify-between gap-2">
                     {[6, 8, 10].map((size) => (
                       <button
                         key={size}
                         onClick={() => setGridSize(size)}
-                        className={`flex-1 py-2 rounded-lg border-2 font-bold transition-all ${
+                        className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all text-sm ${
                           gridSize === size 
-                            ? 'bg-slate-800 text-white border-slate-800' 
-                            : 'bg-white text-slate-500 border-slate-200'
+                            ? 'bg-blue-50 dark:bg-slate-800 border-blue-500 text-blue-600 dark:text-blue-400' 
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
                         }`}
                         disabled={isLoading}
                       >
@@ -230,45 +207,38 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
                 <button 
                   onClick={createRoom}
                   disabled={isLoading}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Creating...' : 'Create Room'}
                 </button>
                </>
              ) : (
-               <div className="flex flex-col items-center bg-blue-50 border-2 border-blue-100 rounded-xl p-6 mb-4">
-                 <span className="text-slate-500 text-xs font-bold uppercase mb-2">Room Code</span>
-                 <div className="text-5xl font-mono font-bold text-blue-600 tracking-wider mb-2 select-all" onClick={copyToClipboard}>
+               <div onClick={copyToClipboard} className="cursor-pointer flex flex-col items-center bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-2xl p-6 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                 <span className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase mb-2">Room Code</span>
+                 <div className="text-6xl font-mono font-black text-blue-600 dark:text-blue-400 tracking-widest">
                    {generatedId}
                  </div>
-                 <p className="text-xs text-blue-400 mb-4">Share this code with your friend</p>
-                 <div className="flex items-center gap-2 text-slate-500 text-sm">
-                   <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                   Waiting for player...
-                 </div>
+                 <p className="text-xs text-blue-400 mt-2">Tap to copy</p>
                </div>
              )}
           </div>
         )}
 
         {activeTab === 'JOIN' && (
-          <div className="animate-in">
-             <div className="mb-6">
-                <label className="block text-slate-500 text-xs font-bold mb-1 uppercase">Room Code</label>
-                <input 
-                  type="number"
-                  pattern="[0-9]*" 
-                  value={roomId}
-                  onChange={(e) => setRoomId(e.target.value.slice(0, 4))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-green-400 font-bold text-slate-800 bg-slate-50 font-mono tracking-widest text-center text-xl uppercase placeholder:normal-case placeholder:tracking-normal placeholder:text-slate-300"
-                  placeholder="e.g. 1234"
-                  disabled={isLoading}
-                />
-              </div>
+          <div className="animate-in space-y-4">
+              <input 
+                type="number"
+                pattern="[0-9]*" 
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value.slice(0, 4))}
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-green-400 dark:focus:border-green-500 rounded-xl font-mono font-bold text-center text-2xl tracking-widest text-slate-800 dark:text-slate-100 outline-none transition-all placeholder:text-slate-300 placeholder:tracking-normal placeholder:font-sans"
+                placeholder="0000"
+                disabled={isLoading}
+              />
               <button 
                 onClick={joinRoom}
                 disabled={isLoading}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Connecting...' : 'Join Game'}
               </button>
@@ -276,7 +246,7 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
         )}
 
         {status && (
-          <div className="mt-4 text-center text-sm font-bold text-slate-500 bg-slate-100 py-2 rounded-lg animate-in">
+          <div className="mt-4 text-center text-sm font-bold text-slate-500 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 py-3 rounded-xl animate-in">
             {status}
           </div>
         )}

@@ -5,12 +5,20 @@
 :root {
   color-scheme: light;
 }
+:root.dark {
+  color-scheme: dark;
+}
 
 body {
   font-family: 'Patrick Hand', cursive;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   background-color: #fdfbf7;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #0f172a;
 }
 
 .paper-pattern {
@@ -19,6 +27,14 @@ body {
     linear-gradient(#e1ebf6 1px, transparent 1px),
     linear-gradient(90deg, #e1ebf6 1px, transparent 1px);
   background-size: 20px 20px;
+  transition: background-color 0.3s ease, background-image 0.3s ease;
+}
+
+.dark .paper-pattern {
+  background-color: #0f172a; /* slate-900 */
+  background-image:
+    linear-gradient(#1e293b 1px, transparent 1px),
+    linear-gradient(90deg, #1e293b 1px, transparent 1px); /* slate-800 lines */
 }
 
 /* Custom scrollbar for game container */
@@ -32,6 +48,9 @@ body {
 .game-scroll::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.1);
   border-radius: 3px;
+}
+.dark .game-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
 }
 
 /* Animation utilities */
@@ -51,4 +70,13 @@ body {
   0% { transform: scale(0); }
   70% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-pop {
+  animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }

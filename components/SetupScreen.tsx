@@ -23,17 +23,13 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
     checkStandalone();
     window.addEventListener('resize', checkStandalone);
 
-    // Check if the event was already captured globally in index.html
     if ((window as any).deferredPrompt) {
       setInstallPrompt((window as any).deferredPrompt);
     }
 
     const handler = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       setInstallPrompt(e);
-      // Update global for consistency
       (window as any).deferredPrompt = e;
     };
     window.addEventListener('beforeinstallprompt', handler);
@@ -45,7 +41,6 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
 
   const handleInstallClick = () => {
     if (installPrompt) {
-      // Trigger the native install prompt
       installPrompt.prompt();
       installPrompt.userChoice.then((choiceResult: any) => {
         if (choiceResult.outcome === 'accepted') {
@@ -63,89 +58,90 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
   
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
-      <div className="bg-white/95 backdrop-blur-md border-2 border-slate-300 rounded-xl shadow-xl p-6 sm:p-8 w-full relative">
-        <button onClick={onBack} className="absolute left-4 top-4 text-slate-400 hover:text-slate-600 font-bold">← Back</button>
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 w-full relative transition-all">
         
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 text-center mb-8 mt-4 tracking-tight" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.05)' }}>
-          Dots & Boxes
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+           <button 
+             onClick={onBack} 
+             className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors"
+           >
+             ←
+           </button>
+           <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Game Setup</h2>
+           <div className="w-10"></div> {/* Spacer */}
+        </div>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {/* Player Names */}
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="block text-slate-500 text-sm font-bold mb-2 uppercase tracking-wide">Player 1 (X)</label>
+          <div className="space-y-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-500">
+                <span className="font-bold text-lg">X</span>
+              </div>
               <input 
                 type="text" 
                 value={p1Name}
                 onChange={(e) => setP1Name(e.target.value)}
                 maxLength={12}
-                className="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-400 font-bold text-slate-800 bg-blue-50 focus:bg-white transition-colors placeholder-slate-400"
-                style={{ color: '#1e293b', backgroundColor: '#eff6ff' }} // Force colors inline to override any dark mode
-                placeholder="Name"
+                className="w-full pl-10 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 rounded-xl font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 group-hover:bg-slate-100 dark:group-hover:bg-slate-750"
+                placeholder="Player 1 Name"
               />
             </div>
-            <div>
-              <label className="block text-slate-500 text-sm font-bold mb-2 uppercase tracking-wide">Player 2 (O)</label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-500">
+                <span className="font-bold text-lg">O</span>
+              </div>
               <input 
                 type="text" 
                 value={p2Name}
                 onChange={(e) => setP2Name(e.target.value)}
                 maxLength={12}
-                className="w-full px-4 py-3 border-2 border-red-200 rounded-lg focus:outline-none focus:border-red-400 font-bold text-slate-800 bg-red-50 focus:bg-white transition-colors placeholder-slate-400"
-                style={{ color: '#1e293b', backgroundColor: '#fef2f2' }} // Force colors inline
-                placeholder="Name"
+                className="w-full pl-10 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-red-500 rounded-xl font-bold text-slate-700 dark:text-slate-200 outline-none transition-all placeholder:text-slate-400 group-hover:bg-slate-100 dark:group-hover:bg-slate-750"
+                placeholder="Player 2 Name"
               />
             </div>
           </div>
 
           {/* Grid Size Selection */}
           <div>
-            <label className="block text-slate-500 text-sm font-bold mb-3 uppercase tracking-wide text-center">Select Grid Size</label>
-            <div className="flex justify-between gap-3">
+            <label className="block text-slate-500 dark:text-slate-400 text-xs font-bold mb-3 uppercase tracking-widest text-center">Grid Size</label>
+            <div className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl flex justify-between relative">
               {[6, 8, 10].map((size) => (
                 <button
                   key={size}
                   type="button"
                   onClick={() => setGridSize(size)}
-                  className={`flex-1 py-3 rounded-lg border-2 font-bold transition-all transform active:scale-95 ${
+                  className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 relative z-10 ${
                     gridSize === size 
-                      ? 'bg-slate-800 text-white border-slate-800 shadow-md scale-105' 
-                      : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400 hover:text-slate-700'
+                      ? 'text-white shadow-lg' 
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
-                  style={gridSize === size ? { backgroundColor: '#1e293b', color: '#ffffff' } : { backgroundColor: '#ffffff', color: '#64748b' }}
                 >
                   {size}x{size}
+                  {gridSize === size && (
+                    <div className="absolute inset-0 bg-slate-800 dark:bg-slate-600 rounded-xl -z-10 animate-in"></div>
+                  )}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="flex flex-col gap-3 mt-4">
-            {/* Start Button */}
             <button 
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg border-b-4 border-green-700 active:border-b-0 active:translate-y-1 transition-all text-xl uppercase tracking-wide"
-              style={{ backgroundColor: '#22c55e', color: '#ffffff' }}
+              className="w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-900/20 active:scale-[0.98] transition-all text-lg tracking-wide"
             >
               Start Game
             </button>
 
-            {/* Install Button - Render ONLY if prompt is available (Android/Desktop) and not installed */}
             {!isStandalone && installPrompt && (
-              <div className="flex flex-col gap-2 animate-in">
-                <button
-                  type="button"
-                  onClick={handleInstallClick}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 transition-all text-base flex items-center justify-center gap-2 uppercase tracking-wide"
-                  style={{ backgroundColor: '#3b82f6', color: '#ffffff' }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  INSTALL APP
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleInstallClick}
+                className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+              >
+                <span>↓</span> Install App
+              </button>
             )}
           </div>
         </form>

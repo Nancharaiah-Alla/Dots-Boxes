@@ -10,7 +10,6 @@ interface GridProps {
   disabled?: boolean;
 }
 
-// Helper to check if a line is filled
 const isHLineFilled = (gameState: GameState, r: number, c: number) => gameState.hLines[r]?.[c];
 const isVLineFilled = (gameState: GameState, r: number, c: number) => gameState.vLines[r]?.[c];
 
@@ -19,61 +18,67 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
 
   useEffect(() => {
     const handleResize = () => {
-      // Calculate natural width of the grid board including padding
-      const gridPadding = window.innerWidth < 640 ? 32 : 64; 
+      const gridPadding = 64; // Account for the p-8 padding (32px * 2)
       const boardWidth = cols * CORNER_SIZE + (cols - 1) * CELL_SIZE + gridPadding;
-      const availableWidth = window.innerWidth - 32; 
+      const availableWidth = window.innerWidth;
+      const availableHeight = window.innerHeight - 180; // Account for scoreboard
 
+      // Calculate width scale
+      let newScale = 1;
       if (boardWidth > availableWidth) {
-        setScale(availableWidth / boardWidth);
-      } else {
-        setScale(1);
+        newScale = (availableWidth - 32) / boardWidth;
       }
+      
+      // Check height constraint
+      const boardHeight = rows * CORNER_SIZE + (rows - 1) * CELL_SIZE + gridPadding;
+      if (boardHeight > availableHeight && availableHeight > 0) {
+          const hScale = availableHeight / boardHeight;
+          if (hScale < newScale) newScale = hScale;
+      }
+      
+      setScale(newScale);
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [cols]);
+  }, [cols, rows]);
 
-  // Visual Row rendering
   const renderHorizontalRow = (rowIndex: number) => {
     const items = [];
     for (let col = 0; col < cols; col++) {
-      // The Dot
+      // DOT
       items.push(
         <div 
           key={`dot-${rowIndex}-${col}`} 
           className="relative z-20 flex-shrink-0 flex items-center justify-center"
           style={{ width: CORNER_SIZE, height: CORNER_SIZE }}
         >
-          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-slate-800 shadow-sm transition-transform hover:scale-150" />
+          <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-slate-800 dark:bg-slate-200 shadow-[0_0_0_2px_rgba(255,255,255,1)] dark:shadow-[0_0_0_2px_rgba(30,41,59,1)]" />
         </div>
       );
 
-      // The Horizontal Line
+      // H-LINE
       if (col < cols - 1) {
         const isFilled = isHLineFilled(gameState, rowIndex, col);
+        const isInteractive = !disabled && !isFilled && !gameState.winner;
 
         items.push(
           <div 
             key={`h-${rowIndex}-${col}`}
-            className={`relative flex items-center justify-center flex-shrink-0 ${disabled && !isFilled ? 'cursor-not-allowed' : ''}`}
+            className={`relative flex items-center justify-center flex-shrink-0 group ${!isFilled && !disabled ? 'cursor-pointer' : ''}`}
             style={{ width: CELL_SIZE, height: CORNER_SIZE }} 
-            onClick={() => !disabled && !isFilled && !gameState.winner && onLineClick('horizontal', rowIndex, col)}
+            onClick={() => isInteractive && onLineClick('horizontal', rowIndex, col)}
           >
             {/* Hit area */}
+            <div className={`absolute -top-3 -bottom-3 left-0 right-0 z-10 ${isInteractive ? 'hover:bg-blue-500/10 dark:hover:bg-blue-400/10 rounded' : ''}`} />
+
+            {/* Visual Line */}
             <div 
-              className={`absolute left-0 right-0 h-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner && !disabled ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`} 
-              style={{ top: '50%', transform: 'translateY(-50%)' }}
-            />
-            
-            {/* The visible line */}
-            <div 
-              className={`h-1 rounded-full transition-all duration-300 ease-out ${
+              className={`h-2 rounded-full transition-all duration-300 ease-out ${
                 isFilled 
-                  ? 'bg-slate-800 w-full opacity-100' 
-                  : 'bg-slate-300 w-full opacity-0'
+                  ? 'bg-slate-800 dark:bg-slate-100 w-[115%] z-10 shadow-md scale-100' 
+                  : 'bg-slate-200 dark:bg-slate-700 w-full scale-100 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50'
               }`}
             />
           </div>
@@ -81,7 +86,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
       }
     }
     return (
-      <div key={`row-h-${rowIndex}`} className="flex items-center">
+      <div key={`row-h-${rowIndex}`} className="flex items-center leading-none">
         {items}
       </div>
     );
@@ -91,32 +96,31 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
     const items = [];
     for (let col = 0; col < cols; col++) {
       const isFilled = isVLineFilled(gameState, rowIndex, col);
+      const isInteractive = !disabled && !isFilled && !gameState.winner;
       
+      // V-LINE
       items.push(
         <div 
           key={`v-${rowIndex}-${col}`}
-          className={`relative flex flex-col items-center justify-start flex-shrink-0 ${disabled && !isFilled ? 'cursor-not-allowed' : ''}`}
+          className={`relative flex flex-col items-center justify-start flex-shrink-0 group ${!isFilled && !disabled ? 'cursor-pointer' : ''}`}
           style={{ height: CELL_SIZE, width: CORNER_SIZE }}
-          onClick={() => !disabled && !isFilled && !gameState.winner && onLineClick('vertical', rowIndex, col)}
+          onClick={() => isInteractive && onLineClick('vertical', rowIndex, col)}
         >
           {/* Hit area */}
-          <div 
-            className={`absolute top-0 bottom-0 w-10 cursor-pointer z-10 hover:bg-blue-200/30 rounded transition-colors ${!isFilled && !gameState.winner && !disabled ? 'hover:opacity-100' : 'hover:opacity-0'} opacity-0`}
-            style={{ left: '50%', transform: 'translateX(-50%)' }}
-          />
+          <div className={`absolute -left-3 -right-3 top-0 bottom-0 z-10 ${isInteractive ? 'hover:bg-blue-500/10 dark:hover:bg-blue-400/10 rounded' : ''}`} />
           
-          {/* The visible line */}
+          {/* Visual Line */}
           <div 
-            className={`w-1 rounded-full transition-all duration-300 ease-out ${
+            className={`w-2 rounded-full transition-all duration-300 ease-out ${
               isFilled 
-                ? 'bg-slate-800 h-full opacity-100' 
-                : 'bg-slate-300 h-full opacity-0'
+                ? 'bg-slate-800 dark:bg-slate-100 h-[115%] z-10 shadow-md scale-100' 
+                : 'bg-slate-200 dark:bg-slate-700 h-full scale-100 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50'
             }`}
           />
         </div>
       );
 
-      // The Square
+      // SQUARE
       if (col < cols - 1) {
         const owner = gameState.squares[rowIndex]?.[col];
         items.push(
@@ -126,11 +130,17 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
             style={{ width: CELL_SIZE, height: CELL_SIZE }}
           >
             {owner && (
-              <span className={`text-2xl sm:text-3xl font-bold select-none animate-bounce-in ${
-                owner === PLAYER_X ? 'text-blue-600' : 'text-red-500'
-              }`}>
-                {owner}
-              </span>
+              <div className="w-full h-full p-1 animate-pop">
+                 <div className={`w-full h-full rounded-lg shadow-sm flex items-center justify-center ${
+                    owner === PLAYER_X 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-red-500 text-white'
+                 }`}>
+                   <span className="text-xl font-black">
+                     {owner}
+                   </span>
+                 </div>
+              </div>
             )}
           </div>
         );
@@ -138,15 +148,15 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
     }
 
     return (
-      <div key={`row-v-${rowIndex}`} className="flex items-start">
+      <div key={`row-v-${rowIndex}`} className="flex items-start leading-none">
         {items}
       </div>
     );
   };
 
   return (
-    <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-      <div className={`inline-block p-4 sm:p-8 bg-white border border-slate-200 shadow-xl rounded-sm select-none transition-opacity ${disabled && !gameState.winner ? 'opacity-90' : 'opacity-100'}`}>
+    <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }} className="my-auto transition-transform duration-300 ease-out">
+      <div className={`inline-flex flex-col p-8 bg-[#f1f5f9] dark:bg-[#1e293b] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-[2rem] select-none transition-all duration-500 border-[6px] border-white dark:border-slate-600 ${disabled && !gameState.winner ? 'opacity-90 grayscale-[0.3]' : 'opacity-100'}`}>
         {Array.from({ length: rows }).map((_, r) => (
           <React.Fragment key={r}>
             {renderHorizontalRow(r)}
