@@ -259,7 +259,7 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full dark:text-slate-200 bg-slate-50 dark:bg-[#0b1120]">
+    <div className="flex flex-col h-full w-full dark:text-slate-200 bg-transparent transition-colors duration-500">
       {/* Header */}
       <header className="pt-6 pb-4 px-6 flex items-center justify-between z-10">
         <button 
