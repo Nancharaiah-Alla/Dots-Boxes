@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dots-boxes-dynamic-v2';
+const CACHE_NAME = 'dots-boxes-dynamic-v3';
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -25,7 +25,15 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // Check if we received a valid response
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+        if (!response || response.status !== 200) {
+          return response;
+        }
+
+        // We generally only want to cache same-origin (basic) requests.
+        // HOWEVER, for PWA installability with external icons, we should cache the icons too.
+        const isExternalIcon = event.request.url.includes('icons8.com');
+        
+        if (response.type !== 'basic' && !isExternalIcon) {
           return response;
         }
 
