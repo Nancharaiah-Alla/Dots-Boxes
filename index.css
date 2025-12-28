@@ -151,3 +151,33 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* Upside Down Text Mode - Stranger Things */
+.upside-down-mode span {
+  /* Spans are inline by default and can't transform. inline-block fixes this. */
+  display: inline-block;
+}
+
+.upside-down-mode h1,
+.upside-down-mode h2,
+.upside-down-mode h3,
+.upside-down-mode h4,
+.upside-down-mode h5,
+.upside-down-mode h6,
+.upside-down-mode p,
+.upside-down-mode span,
+.upside-down-mode label,
+.upside-down-mode input,
+.upside-down-mode button,
+.upside-down-mode [data-cell] {
+  transform: rotate(180deg);
+}
+
+/* Prevent double-rotation if elements are nested (e.g. span inside button) */
+.upside-down-mode button span,
+.upside-down-mode [data-cell] span,
+.upside-down-mode h1 span,
+.upside-down-mode h2 span,
+.upside-down-mode p span {
+  transform: none;
+}

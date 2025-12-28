@@ -56,8 +56,8 @@ function App() {
       <AtmosphereLayer type={atmosphere} />
       {isBreaking && <BreakingTransition />}
       
-      {/* Main Content Wrapper - shakes when breaking */}
-      <div className={`relative h-full w-full flex flex-col transition-transform ${isBreaking ? 'animate-shake-hard' : ''}`}>
+      {/* Main Content Wrapper - shakes when breaking, applies text flip when upside down */}
+      <div className={`relative h-full w-full flex flex-col transition-transform ${isBreaking ? 'animate-shake-hard' : ''} ${atmosphere === 'STRANGER_THINGS' ? 'upside-down-mode' : ''}`}>
         
         {activeGame === 'DOTS' && (
           <DotsGame 

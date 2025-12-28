@@ -296,13 +296,6 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
         ) : (
             <div className="relative z-10 flex flex-col items-center">
                 
-                <div className="mb-6 flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-                   <div className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Progress</div>
-                   <div className="text-xl font-black text-slate-800 dark:text-white font-mono">
-                      {path.length} <span className="text-slate-400 text-base">/ {gridSize * gridSize}</span>
-                   </div>
-                </div>
-
                 <div 
                   className="bg-slate-900/5 dark:bg-black/40 p-3 rounded-2xl backdrop-blur-sm border-2 border-slate-200/50 dark:border-slate-700/50 touch-none select-none shadow-2xl"
                   style={{
