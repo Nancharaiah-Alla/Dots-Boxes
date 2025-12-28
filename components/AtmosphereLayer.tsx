@@ -9,19 +9,36 @@ const AtmosphereLayer: React.FC<AtmosphereLayerProps> = ({ type }) => {
   // Generate random particles based on type
   const particles = useMemo(() => {
     // Increase count for Stranger Things since they are static distributed
-    const count = type === 'NONE' ? 0 : (type === 'STRANGER_THINGS' ? 50 : 25);
+    const count = type === 'NONE' ? 0 : (type === 'STRANGER_THINGS' ? 60 : 25);
     
-    return Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`, // Added top for static positioning
-      // Much slower animation for Stranger Things
-      animationDuration: type === 'STRANGER_THINGS' 
-          ? `${Math.random() * 20 + 20}s` 
-          : `${Math.random() * 10 + 5}s`,
-      animationDelay: `${Math.random() * 5}s`,
-      size: Math.random() * 10 + 5,
-    }));
+    return Array.from({ length: count }).map((_, i) => {
+      // Generate random polygon clip path for irregular shapes (Stranger Things / Ash mode)
+      // Creates irregular quadrilaterals
+      const p1x = Math.floor(Math.random() * 40);
+      const p1y = Math.floor(Math.random() * 40);
+      const p2x = Math.floor(60 + Math.random() * 40);
+      const p2y = Math.floor(Math.random() * 40);
+      const p3x = Math.floor(60 + Math.random() * 40);
+      const p3y = Math.floor(60 + Math.random() * 40);
+      const p4x = Math.floor(Math.random() * 40);
+      const p4y = Math.floor(60 + Math.random() * 40);
+      const polygon = `polygon(${p1x}% ${p1y}%, ${p2x}% ${p2y}%, ${p3x}% ${p3y}%, ${p4x}% ${p4y}%)`;
+
+      return {
+        id: i,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`, // Added top for static positioning
+        // Much slower animation for Stranger Things
+        animationDuration: type === 'STRANGER_THINGS' 
+            ? `${Math.random() * 20 + 20}s` 
+            : `${Math.random() * 10 + 5}s`,
+        animationDelay: `${Math.random() * 5}s`,
+        size: type === 'STRANGER_THINGS' 
+            ? Math.random() * 20 + 8  // Larger, irregular chunks for ash
+            : Math.random() * 10 + 5,
+        clipPath: polygon,
+      };
+    });
   }, [type]);
 
   if (type === 'NONE') return null;
@@ -29,28 +46,28 @@ const AtmosphereLayer: React.FC<AtmosphereLayerProps> = ({ type }) => {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-1000">
       
-      {/* 1. STRANGER THINGS */}
+      {/* 1. STRANGER THINGS (Updated to Ash/Grey style) */}
       {type === 'STRANGER_THINGS' && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-red-950/20 to-slate-900 opacity-80 mix-blend-overlay"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.8)_100%)]"></div>
+          {/* Grey background matching the requested reference image */}
+          <div className="absolute inset-0 bg-slate-500/90 dark:bg-slate-600/90 transition-colors duration-1000"></div>
+          
           {particles.map((p) => (
             <div
               key={p.id}
-              className="absolute bg-slate-400 rounded-full blur-[1px]"
+              className="absolute bg-slate-700 dark:bg-slate-800 shadow-sm"
               style={{
                 left: p.left,
                 top: p.top,
-                width: p.size / 2, // Slightly smaller ash
-                height: p.size / 2,
-                // Using new suspended-ash animation
+                width: p.size,
+                height: p.size,
+                clipPath: p.clipPath, // Irregular polygonal shape
                 animation: `suspended-ash ${p.animationDuration} ease-in-out infinite alternate`,
                 animationDelay: p.animationDelay,
+                opacity: 0.6
               }}
             />
           ))}
-          {/* Subtle red dust overlay */}
-          <div className="absolute inset-0 bg-red-500/5 mix-blend-color-dodge animate-pulse" style={{ animationDuration: '4s' }}></div>
         </>
       )}
 

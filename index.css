@@ -120,3 +120,34 @@ body {
   50% { margin-left: 50px; }
   100% { margin-left: 0px; }
 }
+
+/* Breaking / Earthquake Animations */
+@keyframes shake-hard {
+  0% { transform: translate(0px, 0px) rotate(0deg); }
+  10% { transform: translate(-10px, -10px) rotate(-2deg); }
+  20% { transform: translate(10px, 10px) rotate(2deg); }
+  30% { transform: translate(-10px, 10px) rotate(0deg); }
+  40% { transform: translate(10px, -10px) rotate(2deg); }
+  50% { transform: translate(-10px, -10px) rotate(-2deg); }
+  60% { transform: translate(10px, 10px) rotate(0deg); }
+  70% { transform: translate(-10px, 10px) rotate(2deg); }
+  80% { transform: translate(10px, -10px) rotate(-2deg); }
+  90% { transform: translate(-5px, 0px) rotate(0deg); }
+  100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+.animate-shake-hard {
+  animation: shake-hard 0.4s cubic-bezier(.36,.07,.19,.97) both infinite;
+}
+
+@keyframes crack-expand {
+  0% { stroke-width: 0; opacity: 0; }
+  10% { stroke-width: 2px; opacity: 1; }
+  100% { stroke-width: 8px; opacity: 1; }
+}
+
+.animate-crack {
+  animation: crack-expand 0.9s ease-out forwards;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

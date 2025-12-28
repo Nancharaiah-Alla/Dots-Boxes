@@ -3,6 +3,7 @@ import DotsGame from './components/DotsGame';
 import ZipGame from './components/ZipGame';
 import GameLauncher from './components/GameLauncher';
 import AtmosphereLayer from './components/AtmosphereLayer';
+import BreakingTransition from './components/BreakingTransition';
 import { AtmosphereType } from './types';
 
 type AppState = 'LAUNCHER' | 'DOTS' | 'ZIP';
@@ -19,6 +20,7 @@ function App() {
   });
 
   const [atmosphere, setAtmosphere] = useState<AtmosphereType>('NONE');
+  const [isBreaking, setIsBreaking] = useState(false);
 
   // Apply theme to document
   useEffect(() => {
@@ -36,38 +38,50 @@ function App() {
   };
 
   const handleSetAtmosphere = (type: AtmosphereType) => {
-    setAtmosphere(type);
     if (type === 'STRANGER_THINGS') {
+        setIsBreaking(true);
+        setAtmosphere(type);
         setTheme('dark');
+        // Stop breaking animation after 1 second
+        setTimeout(() => {
+            setIsBreaking(false);
+        }, 1000);
+    } else {
+        setAtmosphere(type);
     }
   };
 
   return (
     <>
       <AtmosphereLayer type={atmosphere} />
+      {isBreaking && <BreakingTransition />}
       
-      {activeGame === 'DOTS' && (
-        <DotsGame 
-          onBackToLauncher={() => setActiveGame('LAUNCHER')} 
-        />
-      )}
+      {/* Main Content Wrapper - shakes when breaking */}
+      <div className={`relative h-full w-full flex flex-col transition-transform ${isBreaking ? 'animate-shake-hard' : ''}`}>
+        
+        {activeGame === 'DOTS' && (
+          <DotsGame 
+            onBackToLauncher={() => setActiveGame('LAUNCHER')} 
+          />
+        )}
 
-      {activeGame === 'ZIP' && (
-        <ZipGame 
-          onBackToLauncher={() => setActiveGame('LAUNCHER')} 
-          theme={theme}
-        />
-      )}
+        {activeGame === 'ZIP' && (
+          <ZipGame 
+            onBackToLauncher={() => setActiveGame('LAUNCHER')} 
+            theme={theme}
+          />
+        )}
 
-      {activeGame === 'LAUNCHER' && (
-        <GameLauncher 
-          onSelectGame={setActiveGame} 
-          theme={theme} 
-          onToggleTheme={toggleTheme}
-          currentAtmosphere={atmosphere}
-          onSetAtmosphere={handleSetAtmosphere}
-        />
-      )}
+        {activeGame === 'LAUNCHER' && (
+          <GameLauncher 
+            onSelectGame={setActiveGame} 
+            theme={theme} 
+            onToggleTheme={toggleTheme}
+            currentAtmosphere={atmosphere}
+            onSetAtmosphere={handleSetAtmosphere}
+          />
+        )}
+      </div>
     </>
   );
 }
