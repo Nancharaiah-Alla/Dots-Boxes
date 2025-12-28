@@ -63,7 +63,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
         <div className="flex items-center justify-between mb-8">
            <button 
              onClick={onBack} 
-             className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors"
+             className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
            >
              ←
            </button>
@@ -138,7 +138,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
               <button
                 type="button"
                 onClick={handleInstallClick}
-                className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+                className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
               >
                 <span>↓</span> Install App
               </button>

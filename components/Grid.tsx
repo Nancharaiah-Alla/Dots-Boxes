@@ -18,7 +18,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
 
   useEffect(() => {
     const handleResize = () => {
-      const gridPadding = 64; // Account for the p-8 padding (32px * 2)
+      const gridPadding = 64; // Account for the p-8 padding
       const boardWidth = cols * CORNER_SIZE + (cols - 1) * CELL_SIZE + gridPadding;
       const availableWidth = window.innerWidth;
       const availableHeight = window.innerHeight - 180; // Account for scoreboard
@@ -54,7 +54,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
           className="relative z-20 flex-shrink-0 flex items-center justify-center"
           style={{ width: CORNER_SIZE, height: CORNER_SIZE }}
         >
-          <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-slate-800 dark:bg-slate-200 shadow-[0_0_0_2px_rgba(255,255,255,1)] dark:shadow-[0_0_0_2px_rgba(30,41,59,1)]" />
+          <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-slate-800 dark:bg-slate-300 shadow-[0_0_0_2px_rgba(255,255,255,1)] dark:shadow-[0_0_0_2px_rgba(30,41,59,1)]" />
         </div>
       );
 
@@ -78,7 +78,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
               className={`h-2 rounded-full transition-all duration-300 ease-out ${
                 isFilled 
                   ? 'bg-slate-800 dark:bg-slate-100 w-[115%] z-10 shadow-md scale-100' 
-                  : 'bg-slate-200 dark:bg-slate-700 w-full scale-100 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50'
+                  : 'bg-slate-200 dark:bg-slate-700 w-full scale-100 group-hover:bg-blue-300 dark:group-hover:bg-blue-700'
               }`}
             />
           </div>
@@ -114,7 +114,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
             className={`w-2 rounded-full transition-all duration-300 ease-out ${
               isFilled 
                 ? 'bg-slate-800 dark:bg-slate-100 h-[115%] z-10 shadow-md scale-100' 
-                : 'bg-slate-200 dark:bg-slate-700 h-full scale-100 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50'
+                : 'bg-slate-200 dark:bg-slate-700 h-full scale-100 group-hover:bg-blue-300 dark:group-hover:bg-blue-700'
             }`}
           />
         </div>
@@ -133,8 +133,8 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
               <div className="w-full h-full p-1 animate-pop">
                  <div className={`w-full h-full rounded-lg shadow-sm flex items-center justify-center ${
                     owner === PLAYER_X 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-red-500 text-white'
+                      ? 'bg-blue-500 text-white shadow-blue-500/50' 
+                      : 'bg-red-500 text-white shadow-red-500/50'
                  }`}>
                    <span className="text-xl font-black">
                      {owner}
@@ -156,7 +156,7 @@ const Grid: React.FC<GridProps> = ({ gameState, onLineClick, rows, cols, disable
 
   return (
     <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }} className="my-auto transition-transform duration-300 ease-out">
-      <div className={`inline-flex flex-col p-8 bg-[#f1f5f9] dark:bg-[#1e293b] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-[2rem] select-none transition-all duration-500 border-[6px] border-white dark:border-slate-600 ${disabled && !gameState.winner ? 'opacity-90 grayscale-[0.3]' : 'opacity-100'}`}>
+      <div className={`inline-flex flex-col p-8 bg-white dark:bg-[#1e293b] shadow-2xl dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] rounded-[2rem] select-none transition-all duration-500 border-[6px] border-slate-100 dark:border-slate-600 ${disabled && !gameState.winner ? 'opacity-90 grayscale-[0.3]' : 'opacity-100'}`}>
         {Array.from({ length: rows }).map((_, r) => (
           <React.Fragment key={r}>
             {renderHorizontalRow(r)}

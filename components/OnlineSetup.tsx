@@ -149,7 +149,7 @@ const OnlineSetup: React.FC<OnlineSetupProps> = ({ onStartGame, onBack }) => {
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 w-full relative transition-all">
         
         <div className="flex items-center justify-between mb-6">
-           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors">←</button>
+           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">←</button>
            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Online Lobby</h2>
            <div className="w-10"></div>
         </div>

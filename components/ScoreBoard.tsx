@@ -23,7 +23,7 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({ scores, currentPlayer, winner, 
     let containerClass = "flex items-center gap-2 sm:gap-3 py-2 px-3 sm:px-4 rounded-2xl transition-all duration-300 relative overflow-hidden ";
     
     if (isWinner) {
-      containerClass += "bg-yellow-100 dark:bg-yellow-900/30 ring-2 ring-yellow-400 scale-105 shadow-lg z-10";
+      containerClass += "bg-yellow-100 dark:bg-yellow-900/40 ring-2 ring-yellow-400 scale-105 shadow-lg z-10";
     } else if (isActive) {
       if (player === PLAYER_X) containerClass += "bg-blue-100 dark:bg-blue-900/40 ring-2 ring-blue-500 shadow-md scale-105 z-10";
       else containerClass += "bg-red-100 dark:bg-red-900/40 ring-2 ring-red-500 shadow-md scale-105 z-10";
@@ -57,17 +57,17 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({ scores, currentPlayer, winner, 
         <div className="flex flex-col items-center justify-center min-w-[60px] shrink-0">
           {winner ? (
             <div className="flex flex-col items-center animate-in">
-               <span className="text-[10px] font-bold uppercase text-slate-400">Result</span>
+               <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500">Result</span>
                <span className={`text-xs sm:text-sm font-black text-center leading-tight ${winner === PLAYER_X ? 'text-blue-500' : winner === PLAYER_O ? 'text-red-500' : 'text-slate-500'}`}>
                  {winner === 'Draw' ? 'DRAW' : 'WINNER'}
                </span>
-               <button onClick={onReset} className="mt-1 text-[10px] bg-slate-800 text-white px-2 py-1 rounded-full font-bold hover:scale-105 transition-transform shadow-lg">
+               <button onClick={onReset} className="mt-1 text-[10px] bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 px-2 py-1 rounded-full font-bold hover:scale-105 transition-transform shadow-lg">
                   RESTART
                </button>
             </div>
           ) : (
             <div className="flex flex-col items-center">
-               <span className="text-[10px] font-bold uppercase text-slate-400 mb-1">Turn</span>
+               <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 mb-1">Turn</span>
                <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-colors duration-300 ${currentPlayer === PLAYER_X ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'} animate-pulse`}></div>
             </div>
           )}

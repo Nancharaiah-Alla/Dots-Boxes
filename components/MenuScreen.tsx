@@ -11,8 +11,8 @@ const MenuScreen: React.FC<MenuScreenProps> = ({ onSelectMode }) => {
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-8 w-full text-center relative overflow-hidden transition-all duration-300 transform hover:shadow-blue-500/10 dark:hover:shadow-blue-900/20">
         
         {/* Decorative elements */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl"></div>
 
         <div className="relative z-10">
           <div className="mb-6 inline-block p-4 bg-blue-50 dark:bg-slate-800 rounded-2xl shadow-inner transform rotate-3">

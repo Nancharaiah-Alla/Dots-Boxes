@@ -220,18 +220,18 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
            </button>
         </div>
 
-        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl p-8 w-full text-center relative overflow-hidden transition-all group">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-8 w-full text-center relative overflow-hidden transition-all group">
           
            {/* Decorative */}
-           <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-slate-900/40 opacity-100"></div>
-           <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse"></div>
+           <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-slate-50 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-slate-900/40 opacity-100"></div>
+           <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-fuchsia-500/10 dark:bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse"></div>
 
            <div className="relative z-10">
               <div className="text-6xl mb-4">🌈</div>
-              <h1 className="text-5xl font-black text-white mb-2 tracking-tight text-shadow-sm">
+              <h1 className="text-5xl font-black text-slate-800 dark:text-white mb-2 tracking-tight text-shadow-sm">
                 Number Slide
               </h1>
-              <p className="text-slate-300 mb-10 font-medium text-lg">Connect the flow.</p>
+              <p className="text-slate-500 dark:text-slate-300 mb-10 font-medium text-lg">Connect the flow.</p>
               
               <div className="flex flex-col gap-4">
                 {[

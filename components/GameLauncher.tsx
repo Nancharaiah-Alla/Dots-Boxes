@@ -11,12 +11,11 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
 
   return (
     <div 
-      className="relative flex flex-col items-center justify-center min-h-full w-full overflow-hidden transition-colors duration-500"
-      style={{ backgroundColor: theme === 'light' ? '#f8fafc' : '#020617' }}
+      className="relative flex flex-col items-center justify-center min-h-full w-full overflow-hidden transition-colors duration-500 bg-slate-50 dark:bg-slate-950"
     >
       
       {/* Dynamic Background Pattern */}
-      <div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500" style={{ opacity: theme === 'light' ? 0.6 : 0.4 }}>
+      <div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 opacity-60 dark:opacity-40">
         <div 
           className="absolute inset-0"
           style={{
@@ -130,18 +129,18 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
             onMouseLeave={() => setHoveredGame(null)}
             onClick={() => onSelectGame('ZIP')}
           >
-            {/* Card Body (Glass/Dark Style) */}
-            <div className="h-full bg-slate-900 dark:bg-black rounded-2xl sm:rounded-[2rem] border-2 sm:border-4 border-slate-800 dark:border-slate-800 p-4 sm:p-10 shadow-xl sm:shadow-2xl relative overflow-hidden isolate flex flex-col">
+            {/* Card Body */}
+            <div className="h-full bg-white dark:bg-black rounded-2xl sm:rounded-[2rem] border-2 sm:border-4 border-slate-100 dark:border-slate-800 p-4 sm:p-10 shadow-xl sm:shadow-2xl relative overflow-hidden isolate flex flex-col">
               
               {/* Aurora Gradient Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-slate-50 dark:from-indigo-900 dark:via-purple-900 dark:to-slate-900 opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
               
               {/* Moving Mesh Gradient */}
-              <div className="absolute inset-0 opacity-30 mix-blend-overlay bg-[length:400%_400%] bg-gradient-to-r from-rose-500 via-fuchsia-500 to-indigo-500 animate-[gradient_15s_ease_infinite]" />
+              <div className="absolute inset-0 opacity-10 dark:opacity-30 mix-blend-overlay bg-[length:400%_400%] bg-gradient-to-r from-rose-400 via-fuchsia-400 to-indigo-400 dark:from-rose-500 dark:via-fuchsia-500 dark:to-indigo-500 animate-[gradient_15s_ease_infinite]" />
 
               {/* Icon / Graphic */}
               <div className="relative mb-3 sm:mb-8 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 origin-center shrink-0">
-                 <div className="w-12 h-12 sm:w-24 sm:h-24 bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl flex items-center justify-center text-3xl sm:text-6xl shadow-xl border border-white/20">
+                 <div className="w-12 h-12 sm:w-24 sm:h-24 bg-white/40 dark:bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl flex items-center justify-center text-3xl sm:text-6xl shadow-xl border border-white/50 dark:border-white/20">
                    🌈
                  </div>
                  {/* Floating numbers */}
@@ -151,15 +150,15 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
 
               {/* Text Content */}
               <div className="relative z-10 flex flex-col flex-1">
-                <h2 className="text-lg sm:text-4xl font-black text-white mb-1 sm:mb-3 group-hover:text-fuchsia-300 transition-colors text-shadow-sm leading-tight">
+                <h2 className="text-lg sm:text-4xl font-black text-slate-800 dark:text-white mb-1 sm:mb-3 group-hover:text-fuchsia-500 dark:group-hover:text-fuchsia-300 transition-colors text-shadow-sm leading-tight">
                   Number Slide
                 </h2>
-                <p className="text-slate-300 text-xs sm:text-lg font-medium leading-relaxed mb-3 sm:mb-8 line-clamp-2 sm:line-clamp-none">
+                <p className="text-slate-500 dark:text-slate-300 text-xs sm:text-lg font-medium leading-relaxed mb-3 sm:mb-8 line-clamp-2 sm:line-clamp-none">
                   A vibrant flow puzzle. Paint with light.
                 </p>
                 
                 {/* CTA Button */}
-                <div className="mt-auto flex items-center gap-2 sm:gap-3 font-bold text-fuchsia-400 text-sm sm:text-xl group-hover:translate-x-2 transition-transform duration-300">
+                <div className="mt-auto flex items-center gap-2 sm:gap-3 font-bold text-fuchsia-500 dark:text-fuchsia-400 text-sm sm:text-xl group-hover:translate-x-2 transition-transform duration-300">
                   <span className="hidden sm:inline">Play Puzzle</span>
                   <span className="sm:hidden">Play</span>
                   <span className="text-lg sm:text-2xl">→</span>
@@ -167,7 +166,7 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
               </div>
 
               {/* Hover Border Glow */}
-              <div className="absolute inset-0 border-4 border-fuchsia-500/0 rounded-2xl sm:rounded-[2rem] transition-all duration-300 group-hover:border-fuchsia-500/40 pointer-events-none" />
+              <div className="absolute inset-0 border-4 border-fuchsia-500/0 rounded-2xl sm:rounded-[2rem] transition-all duration-300 group-hover:border-fuchsia-500/20 pointer-events-none" />
             </div>
           </div>
 
