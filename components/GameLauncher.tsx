@@ -50,7 +50,7 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
         {/* Header Section */}
         <div className="text-center mb-6 sm:mb-16 space-y-1 sm:space-y-4 animate-in shrink-0">
           <h1 className="text-4xl sm:text-8xl font-black text-slate-800 dark:text-white tracking-tighter drop-shadow-sm">
-            Mini Games
+            MindGrid
           </h1>
           <p className="text-sm sm:text-2xl text-slate-500 dark:text-slate-400 font-medium tracking-wide">
             Select a cartridge to start

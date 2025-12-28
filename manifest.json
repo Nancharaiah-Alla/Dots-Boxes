@@ -1,8 +1,8 @@
 {
-  "id": "dots-and-boxes-v1",
-  "name": "Dots & Boxes",
-  "short_name": "Dots & Boxes",
-  "description": "A classic Dots & Boxes strategy game and Number Slide puzzle.",
+  "id": "mindgrid-v1",
+  "name": "MindGrid",
+  "short_name": "MindGrid",
+  "description": "MindGrid: A classic Dots & Boxes strategy game and Number Slide puzzle.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
