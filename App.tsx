@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import DotsGame from './components/DotsGame';
 import ZipGame from './components/ZipGame';
 import GameLauncher from './components/GameLauncher';
+import AtmosphereLayer from './components/AtmosphereLayer';
+import { AtmosphereType } from './types';
 
 type AppState = 'LAUNCHER' | 'DOTS' | 'ZIP';
 
@@ -15,6 +17,8 @@ function App() {
     }
     return 'light';
   });
+
+  const [atmosphere, setAtmosphere] = useState<AtmosphereType>('NONE');
 
   // Apply theme to document
   useEffect(() => {
@@ -31,29 +35,40 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  if (activeGame === 'DOTS') {
-    return (
-      <DotsGame 
-        onBackToLauncher={() => setActiveGame('LAUNCHER')} 
-      />
-    );
-  }
-
-  if (activeGame === 'ZIP') {
-    return (
-      <ZipGame 
-        onBackToLauncher={() => setActiveGame('LAUNCHER')} 
-        theme={theme}
-      />
-    );
-  }
+  const handleSetAtmosphere = (type: AtmosphereType) => {
+    setAtmosphere(type);
+    if (type === 'STRANGER_THINGS') {
+        setTheme('dark');
+    }
+  };
 
   return (
-    <GameLauncher 
-      onSelectGame={setActiveGame} 
-      theme={theme} 
-      onToggleTheme={toggleTheme}
-    />
+    <>
+      <AtmosphereLayer type={atmosphere} />
+      
+      {activeGame === 'DOTS' && (
+        <DotsGame 
+          onBackToLauncher={() => setActiveGame('LAUNCHER')} 
+        />
+      )}
+
+      {activeGame === 'ZIP' && (
+        <ZipGame 
+          onBackToLauncher={() => setActiveGame('LAUNCHER')} 
+          theme={theme}
+        />
+      )}
+
+      {activeGame === 'LAUNCHER' && (
+        <GameLauncher 
+          onSelectGame={setActiveGame} 
+          theme={theme} 
+          onToggleTheme={toggleTheme}
+          currentAtmosphere={atmosphere}
+          onSetAtmosphere={handleSetAtmosphere}
+        />
+      )}
+    </>
   );
 }
 

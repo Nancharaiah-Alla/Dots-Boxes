@@ -14,7 +14,7 @@ body {
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   background-color: #fdfbf7;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.3s ease;
 }
 
 .dark body {
@@ -27,7 +27,7 @@ body {
     linear-gradient(#e1ebf6 1px, transparent 1px),
     linear-gradient(90deg, #e1ebf6 1px, transparent 1px);
   background-size: 20px 20px;
-  transition: background-color 0.3s ease, background-image 0.3s ease;
+  transition: background-color 0.5s ease, background-image 0.5s ease;
 }
 
 .dark .paper-pattern {
@@ -79,4 +79,44 @@ body {
 
 .animate-pop {
   animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ATMOSPHERE ANIMATIONS */
+@keyframes fall {
+  0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
+}
+
+@keyframes rain {
+  0% { transform: translateY(-10vh); }
+  100% { transform: translateY(110vh); }
+}
+
+@keyframes float-ash {
+  0% { transform: translateY(110vh) translateX(0) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) translateX(50px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes suspended-ash {
+  0% { transform: translate(0, 0); opacity: 0.3; }
+  25% { transform: translate(15px, -15px); opacity: 0.6; }
+  50% { transform: translate(0, -30px); opacity: 0.3; }
+  75% { transform: translate(-15px, -15px); opacity: 0.6; }
+  100% { transform: translate(0, 0); opacity: 0.3; }
+}
+
+@keyframes heat-wave {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.3; }
+  50% { transform: translateY(-20px) scaleY(1.1); opacity: 0; }
+  100% { transform: translateY(0) scaleY(1); opacity: 0.3; }
+}
+
+@keyframes sway {
+  0% { margin-left: 0px; }
+  50% { margin-left: 50px; }
+  100% { margin-left: 0px; }
 }

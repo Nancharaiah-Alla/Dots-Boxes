@@ -23,6 +23,8 @@ export interface GameConfig {
   myPlayer?: Player; // 'X' or 'O' (Only for online)
 }
 
+export type AtmosphereType = 'NONE' | 'STRANGER_THINGS' | 'SUMMER' | 'RAINY' | 'WINTER' | 'SPRING';
+
 // Network Payload Types
 export type NetworkMessage = 
   | { type: 'JOIN'; name: string }

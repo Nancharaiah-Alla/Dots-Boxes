@@ -1,21 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { AtmosphereType } from '../types';
 
 interface GameLauncherProps {
   onSelectGame: (game: 'DOTS' | 'ZIP') => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  currentAtmosphere: AtmosphereType;
+  onSetAtmosphere: (type: AtmosphereType) => void;
 }
 
-const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onToggleTheme }) => {
+const GameLauncher: React.FC<GameLauncherProps> = ({ 
+    onSelectGame, 
+    theme, 
+    onToggleTheme, 
+    currentAtmosphere, 
+    onSetAtmosphere 
+}) => {
   const [hoveredGame, setHoveredGame] = useState<'DOTS' | 'ZIP' | null>(null);
+  const [isAtmosphereMenuOpen, setIsAtmosphereMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsAtmosphereMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const atmosphereOptions: { id: AtmosphereType; label: string; icon: string; color: string }[] = [
+    { id: 'NONE', label: 'Default', icon: '∅', color: 'bg-slate-200 text-slate-600' },
+    { id: 'STRANGER_THINGS', label: 'Upside Down', icon: '🕸️', color: 'bg-red-900 text-red-200' },
+    { id: 'SUMMER', label: 'Summer', icon: '☀️', color: 'bg-orange-100 text-orange-600' },
+    { id: 'RAINY', label: 'Rainy', icon: '🌧️', color: 'bg-blue-900 text-blue-200' },
+    { id: 'WINTER', label: 'Winter', icon: '❄️', color: 'bg-blue-50 text-blue-400' },
+    { id: 'SPRING', label: 'Spring', icon: '🌸', color: 'bg-pink-100 text-pink-500' },
+  ];
 
   return (
     <div 
-      className="relative flex flex-col items-center justify-center min-h-full w-full overflow-hidden transition-colors duration-500 bg-slate-50 dark:bg-slate-950"
+      className="relative flex flex-col items-center justify-center min-h-full w-full overflow-hidden transition-colors duration-500 bg-transparent"
     >
       
-      {/* Dynamic Background Pattern */}
-      <div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 opacity-60 dark:opacity-40">
+      {/* Default Dynamic Background Pattern (Only visible if Atmosphere is NONE or subtle) */}
+      <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${currentAtmosphere !== 'NONE' ? 'opacity-10' : 'opacity-60 dark:opacity-40'}`}>
         <div 
           className="absolute inset-0"
           style={{
@@ -26,9 +57,12 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
             maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)'
           }}
         />
-        {/* Floating blurred orbs for color */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+        {currentAtmosphere === 'NONE' && (
+            <>
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/20 dark:bg-blue-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-400/20 dark:bg-purple-600/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+            </>
+        )}
       </div>
 
       {/* Theme Toggle - Absolute Top Right */}
@@ -176,8 +210,47 @@ const GameLauncher: React.FC<GameLauncherProps> = ({ onSelectGame, theme, onTogg
         <div className="mt-6 sm:mt-16 text-slate-400 dark:text-slate-600 font-medium text-[10px] sm:text-sm tracking-widest uppercase opacity-50 shrink-0">
            Arcade Collection • v1.0
         </div>
-
       </div>
+
+       {/* Atmosphere Floating Action Button */}
+       <div className="absolute bottom-4 right-4 z-50" ref={menuRef}>
+         <div className={`absolute bottom-full right-0 mb-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-2 w-48 transition-all duration-200 origin-bottom-right ${isAtmosphereMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
+             <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-2 border-b border-slate-200/50 dark:border-slate-700/50 mb-1">
+               Atmosphere
+             </div>
+             <div className="max-h-64 overflow-y-auto space-y-1">
+                {atmosphereOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                       onSetAtmosphere(option.id);
+                       setIsAtmosphereMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+                       currentAtmosphere === option.id 
+                       ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' 
+                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50'
+                    }`}
+                  >
+                     <span className={`w-6 h-6 flex items-center justify-center rounded text-xs ${option.color}`}>{option.icon}</span>
+                     <span>{option.label}</span>
+                  </button>
+                ))}
+             </div>
+         </div>
+
+         <button
+            onClick={() => setIsAtmosphereMenuOpen(!isAtmosphereMenuOpen)}
+            className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 ${
+              isAtmosphereMenuOpen 
+              ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 rotate-90' 
+              : 'bg-white text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+            }`}
+         >
+            <span className="text-xl sm:text-2xl">✨</span>
+         </button>
+       </div>
+
     </div>
   );
 };
