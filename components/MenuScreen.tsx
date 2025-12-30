@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface MenuScreenProps {
   onSelectMode: (mode: 'OFFLINE' | 'ONLINE') => void;
 }
 
 const MenuScreen: React.FC<MenuScreenProps> = ({ onSelectMode }) => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleStatusChange = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', handleStatusChange);
+    window.addEventListener('offline', handleStatusChange);
+    return () => {
+      window.removeEventListener('online', handleStatusChange);
+      window.removeEventListener('offline', handleStatusChange);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
       
@@ -37,12 +49,19 @@ const MenuScreen: React.FC<MenuScreenProps> = ({ onSelectMode }) => {
             </button>
 
             <button
-              onClick={() => onSelectMode('ONLINE')}
-              className="w-full relative overflow-hidden bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 text-slate-700 dark:text-slate-200 font-bold py-4 rounded-xl shadow-sm transition-all hover:shadow-md hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] group"
+              onClick={() => isOnline && onSelectMode('ONLINE')}
+              disabled={!isOnline}
+              className={`w-full relative overflow-hidden font-bold py-4 rounded-xl shadow-sm transition-all border-2 group
+                ${isOnline 
+                  ? 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 text-slate-700 dark:text-slate-200 hover:shadow-md hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] cursor-pointer' 
+                  : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-70'
+                }`}
             >
                <div className="flex items-center justify-center gap-3 relative z-10">
-                <span className="text-2xl group-hover:scale-110 transition-transform">🌐</span>
-                <span className="text-lg tracking-wide group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Play Online</span>
+                <span className={`text-2xl ${isOnline ? 'group-hover:scale-110 transition-transform' : 'grayscale'}`}>🌐</span>
+                <span className={`text-lg tracking-wide ${isOnline ? 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors' : ''}`}>
+                  {isOnline ? 'Play Online' : 'Online Unavailable'}
+                </span>
               </div>
             </button>
           </div>

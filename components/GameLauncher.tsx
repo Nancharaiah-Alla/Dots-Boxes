@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AtmosphereType } from '../types';
 
 interface GameLauncherProps {
-  onSelectGame: (game: 'DOTS' | 'ZIP') => void;
+  onSelectGame: (game: 'DOTS' | 'ZIP' | 'PRIVACY') => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
   currentAtmosphere: AtmosphereType;
@@ -206,9 +206,15 @@ const GameLauncher: React.FC<GameLauncherProps> = ({
 
         </div>
 
-        {/* Footer Text */}
-        <div className="mt-6 sm:mt-16 text-slate-400 dark:text-slate-600 font-medium text-[10px] sm:text-sm tracking-widest uppercase opacity-50 shrink-0">
-           Arcade Collection • v1.0
+        {/* Footer Text with Privacy Link */}
+        <div className="mt-6 sm:mt-16 text-slate-400 dark:text-slate-600 font-medium text-[10px] sm:text-sm tracking-widest uppercase opacity-50 shrink-0 flex flex-col items-center gap-2">
+           <span>MindGrid • v1.0</span>
+           <button 
+             onClick={() => onSelectGame('PRIVACY')}
+             className="hover:text-slate-600 dark:hover:text-slate-400 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4 transition-all"
+           >
+             Privacy Policy
+           </button>
         </div>
       </div>
 

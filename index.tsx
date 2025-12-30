@@ -14,3 +14,10 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Cast import.meta to any to resolve "Property 'env' does not exist on type 'ImportMeta'" error
+if ((import.meta as any).env?.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}

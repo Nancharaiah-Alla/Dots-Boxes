@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #f0f4f8; gap: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        h1 { margin-top: 0; color: #1e293b; }
+        p { color: #64748b; margin-bottom: 2rem; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.1s; margin: 0 10px; }
+        button:hover { transform: scale(1.05); background: #2563eb; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>App Icon Generator</h1>
+        <p>Click below to generate and download the PNG assets required for the Play Store.</p>
+        <div>
+            <button onclick="generateAndDownload(192)">Download icon-192.png</button>
+            <button onclick="generateAndDownload(512)">Download icon-512.png</button>
+        </div>
+        <div style="margin-top: 20px; font-size: 0.8em; color: #94a3b8;">
+            After downloading, create a folder named <code>icons</code> in your <code>public</code> directory<br>and place these files there.
+        </div>
+    </div>
+
+    <!-- The SVG Source -->
+    <div id="svg-container" style="display: none;">
+        <svg id="source-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+          <defs>
+            <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1e293b"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" fill="url(#bg)"/>
+          <g transform="translate(106, 106)">
+            <path d="M 0 0 L 300 300" stroke="#3b82f6" stroke-width="24" stroke-linecap="round" opacity="0.5"/>
+            <path d="M 300 0 L 0 300" stroke="#3b82f6" stroke-width="24" stroke-linecap="round" opacity="0.5"/>
+            <rect x="0" y="0" width="300" height="300" fill="none" stroke="#3b82f6" stroke-width="20" rx="40" opacity="0.8"/>
+            <circle cx="0" cy="0" r="40" fill="white"/>
+            <circle cx="150" cy="0" r="25" fill="#64748b"/>
+            <circle cx="300" cy="0" r="40" fill="white"/>
+            <circle cx="0" cy="150" r="25" fill="#64748b"/>
+            <circle cx="150" cy="150" r="50" fill="#3b82f6" stroke="white" stroke-width="10"/>
+            <circle cx="300" cy="150" r="25" fill="#64748b"/>
+            <circle cx="0" cy="300" r="40" fill="white"/>
+            <circle cx="150" cy="300" r="25" fill="#64748b"/>
+            <circle cx="300" cy="300" r="40" fill="white"/>
+          </g>
+        </svg>
+    </div>
+
+    <script>
+        function generateAndDownload(size) {
+            const svgElement = document.getElementById('source-svg');
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = size;
+            canvas.height = size;
+
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+                const a = document.createElement('a');
+                a.download = `icon-${size}.png`;
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        }
+    </script>
+</body>
+</html>
