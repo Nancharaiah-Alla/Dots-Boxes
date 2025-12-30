@@ -194,25 +194,39 @@ const DotsGame: React.FC<DotsGameProps> = ({ onBackToLauncher }) => {
     });
   }, [gameConfig, gameState]);
   
+  const BackButton = ({ onClick }: { onClick: () => void }) => (
+    <div className="absolute top-4 left-4 z-50">
+       <button onClick={onClick} className="flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-full text-slate-600 dark:text-slate-300 font-bold hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm">
+          <span className="text-lg">←</span> Back
+       </button>
+    </div>
+  );
+
   if (view === 'MENU') {
     return (
       <>
-        <div className="absolute top-4 left-4 z-50">
-           <button onClick={onBackToLauncher} className="flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-full text-slate-600 dark:text-slate-300 font-bold hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm">
-              <span className="text-lg">←</span> Back
-           </button>
-        </div>
+        <BackButton onClick={onBackToLauncher} />
         <MenuScreen onSelectMode={(mode) => setView(mode === 'ONLINE' ? 'SETUP_ONLINE' : 'SETUP_OFFLINE')} />
       </>
     );
   }
 
   if (view === 'SETUP_OFFLINE') {
-    return <SetupScreen onStart={handleStartOffline} onBack={() => setView('MENU')} />;
+    return (
+      <>
+        <BackButton onClick={() => setView('MENU')} />
+        <SetupScreen onStart={handleStartOffline} />
+      </>
+    );
   }
 
   if (view === 'SETUP_ONLINE') {
-    return <OnlineSetup onStartGame={handleStartOnline} onBack={() => setView('MENU')} />;
+    return (
+      <>
+        <BackButton onClick={() => setView('MENU')} />
+        <OnlineSetup onStartGame={handleStartOnline} />
+      </>
+    );
   }
 
   if (!gameConfig || !gameState) return null;

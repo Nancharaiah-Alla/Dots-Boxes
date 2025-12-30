@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 interface SetupScreenProps {
   onStart: (config: { p1Name: string; p2Name: string; gridSize: number }) => void;
-  onBack: () => void;
 }
 
-const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
+const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState(6);
@@ -60,15 +59,8 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart, onBack }) => {
     <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
       <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-6 sm:p-8 w-full relative transition-all">
         
-        <div className="flex items-center justify-between mb-8">
-           <button 
-             onClick={onBack} 
-             className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-           >
-             ←
-           </button>
+        <div className="mb-8 text-center">
            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Game Setup</h2>
-           <div className="w-10"></div> {/* Spacer */}
         </div>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
