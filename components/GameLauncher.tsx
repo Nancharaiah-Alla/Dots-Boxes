@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AtmosphereType } from '../types';
 
 interface GameLauncherProps {
-  onSelectGame: (game: 'DOTS' | 'ZIP' | 'PRIVACY') => void;
+  onSelectGame: (game: 'DOTS' | 'ZIP') => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
   currentAtmosphere: AtmosphereType;

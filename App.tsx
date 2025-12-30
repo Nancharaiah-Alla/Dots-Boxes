@@ -4,10 +4,9 @@ import ZipGame from './components/ZipGame';
 import GameLauncher from './components/GameLauncher';
 import AtmosphereLayer from './components/AtmosphereLayer';
 import BreakingTransition from './components/BreakingTransition';
-import PrivacyPolicy from './components/PrivacyPolicy';
 import { AtmosphereType } from './types';
 
-type AppState = 'LAUNCHER' | 'DOTS' | 'ZIP' | 'PRIVACY';
+type AppState = 'LAUNCHER' | 'DOTS' | 'ZIP';
 
 function App() {
   const [activeGame, setActiveGame] = useState<AppState>('LAUNCHER');
@@ -50,19 +49,10 @@ function App() {
       }
     };
     
-    // Simple routing logic
+    // Simple routing logic for browser back button
     const handlePopState = () => {
-       if (window.location.pathname === '/privacy') {
-         setActiveGame('PRIVACY');
-       } else {
-         setActiveGame('LAUNCHER');
-       }
+       setActiveGame('LAUNCHER');
     };
-
-    // Check initial URL
-    if (window.location.pathname === '/privacy') {
-       setActiveGame('PRIVACY');
-    }
 
     window.addEventListener('online', handleStatusChange);
     window.addEventListener('offline', handleStatusChange);
@@ -96,14 +86,18 @@ function App() {
 
   const navigateHome = () => {
     try {
-      // Use replaceState if going back to root to avoid building up history stack of same page
-      // or pushState depending on desired UX. Here pushing to support browser back button.
-      // We also check if we are already at root to avoid redundant entries.
-      if (window.location.pathname !== '/') {
-         window.history.pushState({}, '', '/');
+      // Safely attempt to update URL for browser history consistency
+      // Check for blob/file protocols or restricted frames which often block History API
+      const isRestricted = window.location.href.startsWith('blob:') || window.location.protocol === 'file:';
+      
+      if (!isRestricted && window.history && typeof window.history.pushState === 'function') {
+        if (window.location.pathname !== '/') {
+           window.history.pushState({}, '', '/');
+        }
       }
     } catch (e) {
-      console.warn('History API not supported or restricted:', e);
+      // Suppress warning: History API is often restricted in preview environments (iframes).
+      // The app navigation will still work via setActiveGame below.
     }
     setActiveGame('LAUNCHER');
   };
@@ -129,24 +123,9 @@ function App() {
           />
         )}
 
-        {activeGame === 'PRIVACY' && (
-          <PrivacyPolicy 
-            onBack={navigateHome}
-          />
-        )}
-
         {activeGame === 'LAUNCHER' && (
           <GameLauncher 
-            onSelectGame={(game) => {
-               if (game === 'PRIVACY') {
-                  try {
-                    window.history.pushState({}, '', '/privacy');
-                  } catch (e) {
-                     console.warn('History API error:', e);
-                  }
-               }
-               setActiveGame(game);
-            }} 
+            onSelectGame={setActiveGame} 
             theme={theme} 
             onToggleTheme={toggleTheme}
             currentAtmosphere={atmosphere}

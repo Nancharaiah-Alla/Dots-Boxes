@@ -2,7 +2,7 @@
   "id": "mindgrid-v1",
   "name": "MindGrid",
   "short_name": "MindGrid",
-  "description": "MindGrid: A classic Dots & Boxes strategy game and Number Slide puzzle.",
+  "description": "MindGrid: A collection of mind games including Dots & Boxes and Number Slide.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

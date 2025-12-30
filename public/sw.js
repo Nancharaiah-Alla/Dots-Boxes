@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindgrid-v5';
+const CACHE_NAME = 'mindgrid-v6';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -61,7 +61,6 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Exclude API calls or PeerJS signaling (dynamic data)
-  // Assuming API calls might be to external domains or specific paths
   if (url.pathname.startsWith('/api') || url.hostname.includes('peerjs')) {
      return;
   }
@@ -75,7 +74,7 @@ self.addEventListener('fetch', (event) => {
 
       // 2. Fetch from network
       return fetch(event.request).then((networkResponse) => {
-        // Only cache valid responses (basic/cors) and valid status
+        // Only cache valid responses
         if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'error') {
           return networkResponse;
         }
@@ -88,7 +87,12 @@ self.addEventListener('fetch', (event) => {
 
         return networkResponse;
       }).catch(() => {
-        // 3. Offline fallback for navigation
+        // 3. Offline fallback
+        // Return privacy.html for the privacy route
+        if (url.pathname === '/privacy.html') {
+             return caches.match('/privacy.html');
+        }
+        // Return index.html for navigation
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
