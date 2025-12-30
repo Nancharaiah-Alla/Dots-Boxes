@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindgrid-v6';
+const CACHE_NAME = 'mindgrid-v7';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -17,12 +17,10 @@ self.addEventListener('install', (event) => {
       await cache.addAll(URLS_TO_CACHE);
 
       // 2. Dynamically identify and cache hashed assets from index.html
-      // This ensures the main JS/CSS bundles are cached without a build step injecting filenames.
       try {
         const response = await fetch('/index.html');
         if (response.ok) {
            const html = await response.text();
-           // Find standard Vite build assets (/assets/...)
            const assets = html.match(/\/assets\/[^"']+/g) || [];
            const uniqueAssets = [...new Set(assets)];
            if (uniqueAssets.length > 0) {
@@ -36,7 +34,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate: Clean up old caches and take control
+// Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     Promise.all([
@@ -54,32 +52,27 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Cache First strategy for assets, Network First for data/API
+// Fetch: Cache First strategy
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
   const url = new URL(event.request.url);
 
-  // Exclude API calls or PeerJS signaling (dynamic data)
   if (url.pathname.startsWith('/api') || url.hostname.includes('peerjs')) {
      return;
   }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // 1. Return from cache if available (Cache-First)
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // 2. Fetch from network
       return fetch(event.request).then((networkResponse) => {
-        // Only cache valid responses
         if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'error') {
           return networkResponse;
         }
 
-        // Clone and cache
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
@@ -87,12 +80,9 @@ self.addEventListener('fetch', (event) => {
 
         return networkResponse;
       }).catch(() => {
-        // 3. Offline fallback
-        // Return privacy.html for the privacy route
         if (url.pathname === '/privacy.html') {
              return caches.match('/privacy.html');
         }
-        // Return index.html for navigation
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }

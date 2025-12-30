@@ -85,19 +85,19 @@ function App() {
   };
 
   const navigateHome = () => {
-    try {
-      // Safely attempt to update URL for browser history consistency
-      // Check for blob/file protocols or restricted frames which often block History API
-      const isRestricted = window.location.href.startsWith('blob:') || window.location.protocol === 'file:';
-      
-      if (!isRestricted && window.history && typeof window.history.pushState === 'function') {
+    // Robustly handle History API
+    // This prevents "Failed to execute 'pushState'" errors in restricted preview environments (blobs/iframes)
+    const isStandardProtocol = ['http:', 'https:'].includes(window.location.protocol);
+    
+    if (isStandardProtocol) {
+      try {
         if (window.location.pathname !== '/') {
            window.history.pushState({}, '', '/');
         }
+      } catch (e) {
+        // Suppress history errors in restricted environments
+        console.debug('History API restricted, navigation handled internally.');
       }
-    } catch (e) {
-      // Suppress warning: History API is often restricted in preview environments (iframes).
-      // The app navigation will still work via setActiveGame below.
     }
     setActiveGame('LAUNCHER');
   };
