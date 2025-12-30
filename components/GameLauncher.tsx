@@ -209,12 +209,12 @@ const GameLauncher: React.FC<GameLauncherProps> = ({
         {/* Footer Text with Privacy Link */}
         <div className="mt-6 sm:mt-16 text-slate-400 dark:text-slate-600 font-medium text-[10px] sm:text-sm tracking-widest uppercase opacity-50 shrink-0 flex flex-col items-center gap-2">
            <span>MindGrid • v1.0</span>
-           <button 
-             onClick={() => onSelectGame('PRIVACY')}
+           <a 
+             href="/privacy.html"
              className="hover:text-slate-600 dark:hover:text-slate-400 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4 transition-all"
            >
              Privacy Policy
-           </button>
+           </a>
         </div>
       </div>
 

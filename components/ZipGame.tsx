@@ -213,48 +213,50 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
 
   if (view === 'MENU') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
-         <div className="absolute top-4 left-4 z-50">
+      <>
+        <div className="absolute top-4 left-4 z-50">
            <button onClick={onBackToLauncher} className="flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-full text-slate-600 dark:text-slate-300 font-bold hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm">
               <span className="text-lg">←</span> Back
            </button>
         </div>
 
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-8 w-full text-center relative overflow-hidden transition-all group">
-          
-           {/* Decorative */}
-           <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-slate-50 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-slate-900/40 opacity-100"></div>
-           <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-fuchsia-500/10 dark:bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="flex flex-col items-center justify-center min-h-full p-4 w-full max-w-md mx-auto animate-in">
+          <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-slate-700 rounded-3xl shadow-2xl p-8 w-full text-center relative overflow-hidden transition-all group">
+            
+             {/* Decorative */}
+             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-slate-50 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-slate-900/40 opacity-100"></div>
+             <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-fuchsia-500/10 dark:bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse"></div>
 
-           <div className="relative z-10">
-              <div className="text-6xl mb-4">🌈</div>
-              <h1 className="text-5xl font-black text-slate-800 dark:text-white mb-2 tracking-tight text-shadow-sm">
-                Number Slide
-              </h1>
-              <p className="text-slate-500 dark:text-slate-300 mb-10 font-medium text-lg">Connect the flow.</p>
-              
-              <div className="flex flex-col gap-4">
-                {[
-                  { id: 'EASY', label: 'Easy', size: '4x4', color: 'from-green-500 to-emerald-600', icon: '🌱' },
-                  { id: 'MEDIUM', label: 'Medium', size: '5x5', color: 'from-blue-500 to-indigo-600', icon: '💧' },
-                  { id: 'HARD', label: 'Hard', size: '6x6', color: 'from-fuchsia-500 to-purple-600', icon: '🔥' }
-                ].map((item) => (
-                  <button 
-                    key={item.id}
-                    onClick={() => startGame(item.id as Level)} 
-                    className={`w-full relative overflow-hidden bg-gradient-to-r ${item.color} text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] group`}
-                  >
-                    <div className="flex items-center justify-between px-6">
-                      <span className="text-2xl">{item.icon}</span>
-                      <span className="text-lg tracking-wider uppercase">{item.label}</span>
-                      <span className="text-sm opacity-80 bg-black/20 px-2 py-1 rounded">{item.size}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-           </div>
+             <div className="relative z-10">
+                <div className="text-6xl mb-4">🌈</div>
+                <h1 className="text-5xl font-black text-slate-800 dark:text-white mb-2 tracking-tight text-shadow-sm">
+                  Number Slide
+                </h1>
+                <p className="text-slate-500 dark:text-slate-300 mb-10 font-medium text-lg">Connect the flow.</p>
+                
+                <div className="flex flex-col gap-4">
+                  {[
+                    { id: 'EASY', label: 'Easy', size: '4x4', color: 'from-green-500 to-emerald-600', icon: '🌱' },
+                    { id: 'MEDIUM', label: 'Medium', size: '5x5', color: 'from-blue-500 to-indigo-600', icon: '💧' },
+                    { id: 'HARD', label: 'Hard', size: '6x6', color: 'from-fuchsia-500 to-purple-600', icon: '🔥' }
+                  ].map((item) => (
+                    <button 
+                      key={item.id}
+                      onClick={() => startGame(item.id as Level)} 
+                      className={`w-full relative overflow-hidden bg-gradient-to-r ${item.color} text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] group`}
+                    >
+                      <div className="flex items-center justify-between px-6">
+                        <span className="text-2xl">{item.icon}</span>
+                        <span className="text-lg tracking-wider uppercase">{item.label}</span>
+                        <span className="text-sm opacity-80 bg-black/20 px-2 py-1 rounded">{item.size}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+             </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

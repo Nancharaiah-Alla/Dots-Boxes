@@ -95,7 +95,16 @@ function App() {
   };
 
   const navigateHome = () => {
-    window.history.pushState({}, '', '/');
+    try {
+      // Use replaceState if going back to root to avoid building up history stack of same page
+      // or pushState depending on desired UX. Here pushing to support browser back button.
+      // We also check if we are already at root to avoid redundant entries.
+      if (window.location.pathname !== '/') {
+         window.history.pushState({}, '', '/');
+      }
+    } catch (e) {
+      console.warn('History API not supported or restricted:', e);
+    }
     setActiveGame('LAUNCHER');
   };
 
@@ -130,7 +139,11 @@ function App() {
           <GameLauncher 
             onSelectGame={(game) => {
                if (game === 'PRIVACY') {
-                  window.history.pushState({}, '', '/privacy');
+                  try {
+                    window.history.pushState({}, '', '/privacy');
+                  } catch (e) {
+                     console.warn('History API error:', e);
+                  }
                }
                setActiveGame(game);
             }} 
