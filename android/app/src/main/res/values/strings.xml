@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MindGrid</string>
+    <string name="title_activity_main">MindGrid</string>
+    <string name="package_name">com.mindgrid.app</string>
+    <string name="custom_url_scheme">com.mindgrid.app</string>
+</resources>

@@ -1,5 +1,6 @@
 {
   "requestFramePermissions": [],
   "name": "MindGrid",
-  "description": "A collection of mind games including Dots & Boxes and Number Slide."
+  "description": "A collection of mind games including Dots & Boxes and Number Slide.",
+  "majorCapabilities": []
 }

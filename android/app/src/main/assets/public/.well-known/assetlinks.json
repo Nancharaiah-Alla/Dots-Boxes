@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.venkat.mindgrid",
+      "sha256_cert_fingerprints": [
+        "02:72:51:9D:59:8E:6F:A5:12:21:D0:41:5E:10:29:BB:46:7C:E3:DA:C1:90:07:F6:B1:A5:08:42:D0:D8:28:22"
+      ]
+    }
+  }
+]

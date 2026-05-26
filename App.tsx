@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import DotsGame from './components/DotsGame';
 import ZipGame from './components/ZipGame';
 import GameLauncher from './components/GameLauncher';
+import SplashScreen from './components/SplashScreen';
 import AtmosphereLayer from './components/AtmosphereLayer';
 import BreakingTransition from './components/BreakingTransition';
 import { AtmosphereType } from './types';
 
-type AppState = 'LAUNCHER' | 'DOTS' | 'ZIP';
+type AppState = 'SPLASH' | 'LAUNCHER' | 'DOTS' | 'ZIP';
 
 function App() {
-  const [activeGame, setActiveGame] = useState<AppState>('LAUNCHER');
+  const [activeGame, setActiveGame] = useState<AppState>('SPLASH');
   
   // Theme State managed globally
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -110,6 +111,10 @@ function App() {
       {/* Main Content Wrapper */}
       <div className={`relative h-full w-full flex flex-col transition-transform ${isBreaking ? 'animate-shake-hard' : ''} ${atmosphere === 'STRANGER_THINGS' ? 'upside-down-mode' : ''}`}>
         
+        {activeGame === 'SPLASH' && (
+          <SplashScreen onComplete={() => setActiveGame('LAUNCHER')} theme={theme} />
+        )}
+
         {activeGame === 'DOTS' && (
           <DotsGame 
             onBackToLauncher={navigateHome} 

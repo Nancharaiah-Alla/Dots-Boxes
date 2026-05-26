@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Privacy Policy - MindGrid</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+             colors: { paper: '#fdfbf7' }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+       body { font-family: 'Patrick Hand', cursive; }
+       .paper-pattern {
+          background-color: #fdfbf7;
+          background-image:
+            linear-gradient(#e1ebf6 1px, transparent 1px),
+            linear-gradient(90deg, #e1ebf6 1px, transparent 1px);
+          background-size: 20px 20px;
+       }
+       .dark .paper-pattern {
+          background-color: #0f172a;
+          background-image:
+            linear-gradient(#1e293b 1px, transparent 1px),
+            linear-gradient(90deg, #1e293b 1px, transparent 1px);
+       }
+    </style>
+    <script>
+        // Check for dark mode preference to match app theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<body class="paper-pattern text-slate-700 dark:text-slate-200 min-h-screen flex flex-col transition-colors duration-300">
+    
+    <div class="flex flex-col h-full w-full max-w-4xl mx-auto bg-slate-50 dark:bg-slate-900 min-h-screen shadow-2xl relative">
+      
+      <!-- Header -->
+      <div class="pt-6 pb-4 px-6 flex items-center sticky top-0 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 z-10">
+        <a 
+          href="/"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold transition-all text-xl no-underline"
+          aria-label="Back"
+        >
+          ←
+        </a>
+        <h1 class="flex-1 text-center text-2xl font-black text-slate-800 dark:text-white tracking-tight pr-10">
+          Privacy Policy
+        </h1>
+      </div>
+
+      <div class="p-6 sm:p-8 space-y-8 text-slate-700 dark:text-slate-300 text-lg">
+        <section>
+          <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Introduction</h2>
+          <p class="leading-relaxed">
+            Welcome to <strong>MindGrid</strong>. We are committed to protecting your privacy. This Privacy Policy explains how we handle your information when you use our application.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Data Collection</h2>
+          <p class="leading-relaxed">
+            <strong>We do not collect, transmit, or store any personal data.</strong> MindGrid operates as a standalone application on your device. We do not require you to create an account, and we do not track your usage behavior.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Local Storage</h2>
+          <p class="leading-relaxed">
+            We use your device's local storage to save your game progress, high scores, and preferences (such as theme and visual settings). This data is stored strictly on your device and is not shared with us or any third parties.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Online Play</h2>
+          <p class="leading-relaxed">
+            For multiplayer features, MindGrid establishes a direct Peer-to-Peer (P2P) connection between players. No gameplay data, chat messages, or personal identifiers pass through or are stored on our servers. Ephemeral connection IDs are used solely to establish the game session and are discarded afterwards.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Analytics & Tracking</h2>
+          <p class="leading-relaxed">
+            We do not use any third-party analytics services, tracking pixels, or advertising cookies.
+          </p>
+        </section>
+
+        <div class="pt-8 mt-8 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-500 text-center">
+          <p>MindGrid © <script>document.write(new Date().getFullYear())</script></p>
+        </div>
+      </div>
+    </div>
+
+</body>
+</html>

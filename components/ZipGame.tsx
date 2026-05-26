@@ -13,6 +13,7 @@ const posKey = (r: number, c: number) => `${r},${c}`;
 const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
   const [view, setView] = useState<'MENU' | 'GAME'>('MENU');
   const [level, setLevel] = useState<Level>('EASY');
+  const [levelNumber, setLevelNumber] = useState(1);
   const [gridSize, setGridSize] = useState(4);
   
   const [fixedCells, setFixedCells] = useState<Map<string, number>>(new Map());
@@ -34,6 +35,7 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
     const size = getGridSize(lvl);
     setGridSize(size);
     setLevel(lvl);
+    setLevelNumber(1);
     setIsGenerating(true);
     setView('GAME');
     
@@ -275,7 +277,7 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
               Number Slide
             </h1>
             <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-               {level} • {gridSize}x{gridSize}
+               {level} • Level {levelNumber} • {gridSize}x{gridSize}
             </span>
         </div>
         <div className="w-10"></div>
@@ -365,7 +367,10 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
                                 Level Complete! 🎉
                             </div>
                             <button 
-                                onClick={() => generatePuzzle(gridSize)}
+                                onClick={() => {
+                                    setLevelNumber(prev => prev + 1);
+                                    generatePuzzle(gridSize);
+                                }}
                                 className="px-8 py-3 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-bold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all"
                             >
                                 Next Puzzle →
@@ -381,7 +386,10 @@ const ZipGame: React.FC<ZipGameProps> = ({ onBackToLauncher, theme }) => {
                                 ↺
                             </button>
                             <button 
-                                onClick={() => generatePuzzle(gridSize)}
+                                onClick={() => {
+                                    setLevelNumber(prev => prev + 1);
+                                    generatePuzzle(gridSize);
+                                }}
                                 className="px-6 py-2 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-full hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors text-sm"
                             >
                                 Skip Puzzle
